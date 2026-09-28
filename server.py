@@ -48,12 +48,14 @@ def run_analysis(video, target, limit, emit):
                 emit("progress", {"done": done, "total": total})
 
     t0 = time.time()
-    usage, failed = jc.score_all(comments, jev_key, jc.build_questions(target), 16, progress)
+    context = jc.video_context(meta)
+    usage, failed = jc.score_all(comments, jev_key, jc.build_questions(target), 16, progress, context)
     run = {
         "id": time.strftime("%Y%m%d-%H%M%S") + "-" + vid,
         "created": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "video": meta,
         "target": target,
+        "context": context,
         "threshold": jc.THRESHOLD,
         "reason_labels": jc.REASON_LABELS,
         "report": jc.report(comments),

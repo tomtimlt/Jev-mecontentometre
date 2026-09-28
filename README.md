@@ -30,3 +30,27 @@ Options : `--target` (contre qui mesurer le mécontentement, défaut : la vidéo
 `--max` (nombre de commentaires, défaut 500), `--workers` (parallélisme Jev), `--json` (export détaillé).
 
 Aucune dépendance : Python 3 standard uniquement.
+
+## Structure de la requête Jev
+
+Chaque commentaire est envoyé avec le contexte de la vidéo (titre, chaîne, premier paragraphe
+de la description) dans le `state`, et les questions demandent de juger uniquement le commentaire :
+
+```
+state: YouTube video "<titre>" by <chaîne>.
+       Video summary: <résumé>
+
+       Comment: <commentaire>
+```
+
+`eval/compare_prompts.py` compare plusieurs structures sur un jeu étiqueté à la main
+(`eval/apple_ipad_crush.json`, 38 commentaires surtout ambigus) :
+
+| Variante | Exactitude | AUC |
+|---|---|---|
+| Commentaire seul | 79 % | 0,90 |
+| + titre | 87 % | 0,98 |
+| **+ titre + résumé (retenu)** | **95-97 %** | **0,98** |
+| Résumé dans les instructions | 84-89 % | 0,95 |
+
+`--no-context` désactive le contexte en ligne de commande.
