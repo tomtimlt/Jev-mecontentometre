@@ -20,7 +20,7 @@ import urllib.parse
 import urllib.request
 
 JEV_URL = "https://api.typesafe.ai/v1/systemone"
-YT_URL = "https://www.googleapis.com/youtube/v3/commentThreads"
+YT_API = "https://www.googleapis.com/youtube/v3"
 THRESHOLD = 0.5
 
 # Raisons du mécontentement : n'ont de sens que pour les commentaires mécontents.
@@ -73,21 +73,54 @@ def video_id(arg):
     return m.group(1) if m else arg
 
 
+class YouTubeError(Exception):
+    pass
+
+
+def yt_get(endpoint, key, **params):
+    params["key"] = key
+    try:
+        with urllib.request.urlopen(f"{YT_API}/{endpoint}?{urllib.parse.urlencode(params)}") as r:
+            return json.load(r)
+    except urllib.error.HTTPError as e:
+        try:
+            msg = json.load(e)["error"]["message"]
+        except Exception:
+            msg = str(e)
+        raise YouTubeError(f"Erreur YouTube {e.code} : {msg}") from None
+
+
+def fetch_video(vid, key):
+    items = yt_get("videos", key, part="snippet,statistics", id=vid).get("items", [])
+    if not items:
+        raise YouTubeError(f"Vidéo introuvable : {vid}")
+    sn, st = items[0]["snippet"], items[0].get("statistics", {})
+    thumbs = sn.get("thumbnails", {})
+    return {
+        "id": vid,
+        "title": sn.get("title", ""),
+        "channel": sn.get("channelTitle", ""),
+        "published": sn.get("publishedAt", ""),
+        "thumbnail": (thumbs.get("medium") or thumbs.get("default") or {}).get("url", ""),
+        "views": int(st.get("viewCount", 0)),
+        "likes": int(st.get("likeCount", 0)),
+        "comment_count": int(st.get("commentCount", 0)),
+    }
+
+
 def fetch_comments(vid, key, limit):
     comments, token = [], None
     while len(comments) < limit:
         params = {"part": "snippet", "videoId": vid, "maxResults": 100,
-                  "textFormat": "plainText", "order": "relevance", "key": key}
+                  "textFormat": "plainText", "order": "relevance"}
         if token:
             params["pageToken"] = token
-        try:
-            with urllib.request.urlopen(f"{YT_URL}?{urllib.parse.urlencode(params)}") as r:
-                data = json.load(r)
-        except urllib.error.HTTPError as e:
-            sys.exit(f"Erreur YouTube {e.code} : {e.read().decode()[:300]}")
+        data = yt_get("commentThreads", key, **params)
         for item in data.get("items", []):
             s = item["snippet"]["topLevelComment"]["snippet"]
-            comments.append({"text": s["textDisplay"], "likes": s.get("likeCount", 0)})
+            comments.append({"text": s["textDisplay"], "likes": s.get("likeCount", 0),
+                             "author": s.get("authorDisplayName", ""),
+                             "published": s.get("publishedAt", "")})
         token = data.get("nextPageToken")
         if not token:
             break
@@ -116,7 +149,11 @@ def score(text, key, questions, retries=5):
             raise
 
 
-def score_all(comments, key, questions, workers):
+def print_progress(done, total):
+    print(f"\rNotation Jev : {done}/{total}", end="" if done < total else "\n", file=sys.stderr)
+
+
+def score_all(comments, key, questions, workers, on_progress=print_progress):
     usage = {"input_tokens": 0, "output_tokens": 0}
     failed = 0
     done = 0
@@ -132,8 +169,7 @@ def score_all(comments, key, questions, workers):
                 c["error"] = str(e)
                 failed += 1
             done += 1
-            print(f"\rNotation Jev : {done}/{len(comments)}", end="", file=sys.stderr)
-    print(file=sys.stderr)
+            on_progress(done, len(comments))
     return usage, failed
 
 
@@ -194,7 +230,10 @@ def main():
         sys.exit("Variables Youtube_V3 et TYPESAFE_API_KEY requises.")
 
     vid = video_id(args.video)
-    comments = fetch_comments(vid, yt_key, args.max)
+    try:
+        comments = fetch_comments(vid, yt_key, args.max)
+    except YouTubeError as e:
+        sys.exit(str(e))
     if not comments:
         sys.exit("Aucun commentaire trouvé (désactivés ?).")
     print(f"{len(comments)} commentaires récupérés.", file=sys.stderr)
