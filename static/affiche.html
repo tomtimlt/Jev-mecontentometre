@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Affiche · Mécontentomètre</title>
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Geist:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0E0D0B;
+  --panel: #171613;
+  --line: #2A2824;
+  --ink: #F4F1EA;
+  --ink-2: #B3AEA3;
+  --ink-3: #8C877C;
+  --red: #FF5233;
+  --cell: #3B3934;
+  --tile: #2F2D29;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050504; color: var(--ink); font-family: "Geist", system-ui, sans-serif; }
+body { min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+.toolbar { width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 16px; font-size: 14px; color: var(--ink-2); }
+.toolbar a { color: var(--ink); }
+body.export .toolbar { display: none; }
+.stage { width: 100%; display: flex; justify-content: center; padding: 0 16px 32px; }
+body.export .stage { padding: 0; }
+
+/* L'affiche : 1200 x 1500 (format portrait 4:5 de LinkedIn) */
+.poster {
+  width: 1200px; height: 1500px; flex-shrink: 0; position: relative; overflow: hidden;
+  background: var(--bg); padding: 56px; display: flex; flex-direction: column;
+  transform-origin: top left;
+}
+.poster::before {
+  content: ""; position: absolute; inset: -200px -200px auto auto; width: 700px; height: 700px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 82, 51, .20), rgba(255, 82, 51, 0)); pointer-events: none;
+}
+.num { font-family: "Space Grotesk", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+.display { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 800; }
+
+.top { display: flex; justify-content: space-between; align-items: center; position: relative; }
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand img { width: 52px; height: 52px; filter: drop-shadow(0 0 1px rgba(244, 241, 234, .55)); }
+.brand span { font-size: 34px; letter-spacing: -0.03em; }
+.jev { display: flex; align-items: center; gap: 12px; font-size: 18px; color: var(--ink-2); }
+.jev img { width: 44px; height: 44px; border-radius: 50%; }
+.jev b { font-size: 32px; color: var(--ink); letter-spacing: -0.02em; }
+
+.kicker { margin-top: 44px; display: flex; align-items: center; gap: 12px; font-family: "Space Grotesk", sans-serif; font-weight: 600; font-size: 22px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.kicker i { width: 12px; height: 12px; border-radius: 50%; background: var(--red); box-shadow: 0 0 12px var(--red); }
+h1 { margin: 14px 0 0; font-size: 116px; line-height: .94; letter-spacing: -0.045em; }
+h1 .l2 { display: block; color: var(--ink-3); }
+h1 em { font-style: normal; color: var(--red); text-shadow: 0 0 40px rgba(255, 82, 51, .45); }
+h1 .l2 em { color: var(--ink); text-shadow: none; }
+
+.video { margin-top: 28px; display: flex; align-items: center; gap: 20px; }
+.video img { width: 136px; height: 76px; object-fit: cover; border-radius: 10px; background: var(--panel); flex-shrink: 0; }
+.video .t { font-size: 21px; font-weight: 600; line-height: 1.25; }
+.video .s { font-size: 21px; line-height: 1.35; color: var(--ink-2); margin-top: 4px; }
+.video .s b { color: var(--ink); font-weight: 600; }
+
+.panels { margin-top: 32px; flex: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; min-height: 0; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 22px 22px 18px; display: flex; flex-direction: column; min-height: 0; }
+.phead { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+.plabel { font-family: "Space Grotesk", sans-serif; font-weight: 600; font-size: 17px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.pcap { font-size: 16px; color: var(--ink-3); margin-top: 4px; }
+.pval { font-size: 64px; line-height: .9; letter-spacing: -0.04em; }
+.pval.red { color: var(--red); text-shadow: 0 0 28px rgba(255, 82, 51, .5); }
+.canvas-wrap { flex: 1; margin-top: 16px; position: relative; min-height: 0; }
+canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.foot { margin-top: 26px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.legend { display: flex; flex-direction: column; gap: 6px; font-size: 17px; color: var(--ink-2); }
+.legend .row { display: flex; align-items: center; gap: 10px; }
+.legend i { width: 14px; height: 14px; border-radius: 3px; }
+.stats { font-size: 17px; color: var(--ink-2); }
+.stats b { color: var(--ink); }
+.gh { display: flex; align-items: center; gap: 12px; padding: 12px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); font-size: 18px; font-weight: 600; }
+.gh svg { fill: var(--ink); }
+.error { padding: 40px; color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <a href="./" id="back">← Retour au dashboard</a>
+  <span>Affiche 1200 × 1500, format portrait LinkedIn. Fais une capture d'écran pour la partager.</span>
+</div>
+<div class="stage" id="stage">
+  <div class="poster" id="poster" hidden>
+    <div class="top">
+      <div class="brand"><img src="logo.svg" alt=""><span class="display">Mécontentomètre</span></div>
+      <div class="jev">propulsé par <img src="jev-logo.png" alt="Logo Jev"><b class="display">JEV</b></div>
+    </div>
+
+    <div class="kicker"><i></i><span id="kicker"></span></div>
+    <h1 class="display" id="headline"></h1>
+
+    <div class="video">
+      <img id="thumb" alt="">
+      <div>
+        <div class="t" id="vtitle"></div>
+        <div class="s" id="vsub"></div>
+      </div>
+    </div>
+
+    <div class="panels">
+      <div class="panel">
+        <div class="phead">
+          <div><div class="plabel">En nombre de commentaires</div><div class="pcap">1 carré = 1 commentaire</div></div>
+          <div class="pval red display" id="pCount"></div>
+        </div>
+        <div class="canvas-wrap"><canvas id="waffle"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="phead">
+          <div><div class="plabel">En nombre de likes</div><div class="pcap">taille du bloc = likes du commentaire</div></div>
+          <div class="pval display" id="pLikes"></div>
+        </div>
+        <div class="canvas-wrap"><canvas id="tree"></canvas></div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <div class="legend">
+        <div class="row"><i style="background:var(--red);box-shadow:0 0 8px var(--red)"></i><span id="legendRed"></span></div>
+        <div class="row"><i style="background:#6A675F"></i><span>Neutre ou positif</span></div>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div class="gh">
+        <svg width="24" height="24" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        tomtimlt/Jev-mecontentometre
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const nf = new Intl.NumberFormat("fr-FR");
+const compact = new Intl.NumberFormat("fr-FR", { notation: "compact", maximumFractionDigits: 1 });
+const pct = (x) => x.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " %";
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const RED = "#FF5233", CELL = "#3B3934", TILE = "#2F2D29";
+const JEV_PRICE_PER_M = 0.042;  // $ par million de tokens d'entrée (sortie gratuite), tarif public relevé en 2026
+
+const params = new URLSearchParams(location.search);
+if (params.has("export")) document.body.classList.add("export");
+
+function fit() {
+  const poster = $("poster");
+  if (document.body.classList.contains("export")) return;
+  const scale = Math.min(1, (window.innerWidth - 32) / 1200);
+  poster.style.transform = `scale(${scale})`;
+  $("stage").style.height = 1500 * scale + 32 + "px";
+  poster.parentElement.style.width = 1200 * scale + 32 + "px";
+}
+
+function setupCanvas(cv) {
+  const r = cv.getBoundingClientRect();
+  const w = cv.offsetWidth, h = cv.offsetHeight, dpr = Math.max(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  const ctx = cv.getContext("2d");
+  ctx.scale(dpr, dpr);
+  return { ctx, w, h };
+}
+
+/* Mosaïque : un carré par commentaire, dans l'ordre de YouTube */
+function drawWaffle(cv, items) {
+  const { ctx, w, h } = setupCanvas(cv);
+  const n = items.length;
+  let pitch = Math.sqrt((w * h) / n);
+  while (pitch > 1) {
+    const cols = Math.floor(w / pitch), rows = Math.ceil(n / cols);
+    if (rows * pitch <= h) break;
+    pitch -= 0.05;
+  }
+  const cols = Math.floor(w / pitch), rows = Math.ceil(n / cols);
+  const ox = (w - cols * pitch) / 2, oy = (h - rows * pitch) / 2;
+  const gap = Math.max(1, pitch * 0.18), size = pitch - gap, rad = Math.min(2, size / 4);
+  const cell = (i, color) => {
+    const x = ox + (i % cols) * pitch, y = oy + Math.floor(i / cols) * pitch;
+    ctx.fillStyle = color; ctx.beginPath(); ctx.roundRect(x, y, size, size, rad); ctx.fill();
+  };
+  items.forEach((c, i) => { if (!c.red) cell(i, CELL); });
+  ctx.shadowColor = RED; ctx.shadowBlur = pitch * 1.4;
+  items.forEach((c, i) => { if (c.red) cell(i, RED); });
+  ctx.shadowBlur = 0;
+}
+
+/* Treemap « squarified » : chaque commentaire est un bloc proportionnel à ses likes */
+function squarify(items, x, y, w, h) {
+  const total = items.reduce((s, it) => s + it.v, 0);
+  const scale = (w * h) / total;
+  const nodes = items.map((it) => ({ it, a: it.v * scale }));
+  const out = [];
+  let i = 0;
+  while (i < nodes.length) {
+    const side = Math.min(w, h);
+    let row = [nodes[i]], rowArea = nodes[i].a, best = worst(row, rowArea, side);
+    let j = i + 1;
+    while (j < nodes.length) {
+      const next = rowArea + nodes[j].a, cand = worst(row.concat(nodes[j]), next, side);
+      if (cand > best) break;
+      row.push(nodes[j]); rowArea = next; best = cand; j++;
+    }
+    const thick = rowArea / side;
+    let off = 0;
+    for (const nd of row) {
+      const len = nd.a / thick;
+      if (w >= h) out.push({ it: nd.it, x, y: y + off, w: thick, h: len });
+      else out.push({ it: nd.it, x: x + off, y, w: len, h: thick });
+      off += len;
+    }
+    if (w >= h) { x += thick; w -= thick; } else { y += thick; h -= thick; }
+    i = j;
+  }
+  return out;
+}
+function worst(row, area, side) {
+  let max = 0, min = Infinity;
+  for (const r of row) { max = Math.max(max, r.a); min = Math.min(min, r.a); }
+  const s2 = side * side, a2 = area * area;
+  return Math.max((s2 * max) / a2, a2 / (s2 * min));
+}
+
+function wrapText(ctx, text, maxW, maxLines) {
+  const words = text.replace(/\s+/g, " ").trim().split(" ");
+  const lines = [];
+  let line = "";
+  for (const word of words) {
+    const test = line ? line + " " + word : word;
+    if (ctx.measureText(test).width <= maxW) { line = test; continue; }
+    if (line) lines.push(line);
+    line = word;
+    if (lines.length === maxLines) break;
+  }
+  if (lines.length < maxLines && line) lines.push(line);
+  if (lines.length === maxLines && words.join(" ").length > lines.join(" ").length) {
+    let last = lines[maxLines - 1];
+    while (last && ctx.measureText(last + "…").width > maxW) last = last.slice(0, -1);
+    lines[maxLines - 1] = last.trimEnd() + "…";
+  }
+  return lines;
+}
+
+function drawTree(cv, items) {
+  const { ctx, w, h } = setupCanvas(cv);
+  const sorted = items.slice().sort((a, b) => b.v - a.v);
+  const rects = squarify(sorted, 0, 0, w, h);
+  const gap = 1.5;
+  for (const r of rects) {
+    if (r.it.red) continue;
+    ctx.fillStyle = TILE;
+    ctx.beginPath(); ctx.roundRect(r.x + gap / 2, r.y + gap / 2, Math.max(0.5, r.w - gap), Math.max(0.5, r.h - gap), Math.min(6, r.w / 6, r.h / 6)); ctx.fill();
+  }
+  ctx.shadowColor = RED; ctx.shadowBlur = 8;
+  for (const r of rects) {
+    if (!r.it.red) continue;
+    ctx.fillStyle = RED;
+    ctx.beginPath(); ctx.roundRect(r.x + gap / 2, r.y + gap / 2, Math.max(0.8, r.w - gap), Math.max(0.8, r.h - gap), Math.min(4, r.w / 6, r.h / 6)); ctx.fill();
+  }
+  ctx.shadowBlur = 0;
+  // Texte des plus gros blocs : les commentaires les plus likés
+  for (const r of rects) {
+    if (r.w < 110 || r.h < 64) continue;
+    const pad = Math.min(14, r.w / 12);
+    const big = Math.max(15, Math.min(34, Math.sqrt(r.w * r.h) / 7));
+    ctx.fillStyle = r.it.red ? "#1A0A06" : "#F4F1EA";
+    ctx.font = `700 ${big}px "Space Grotesk", sans-serif`;
+    ctx.textBaseline = "top";
+    ctx.fillText(`${compact.format(r.it.likes)} likes`, r.x + pad, r.y + pad);
+    const fs = Math.max(12, Math.min(19, big * 0.58));
+    ctx.font = `500 ${fs}px "Geist", sans-serif`;
+    ctx.fillStyle = r.it.red ? "#2A0E08" : "#B3AEA3";
+    const maxLines = Math.floor((r.h - pad * 2 - big - 8) / (fs * 1.3));
+    if (maxLines < 1) continue;
+    wrapText(ctx, "« " + r.it.text + " »", r.w - pad * 2, maxLines)
+      .forEach((ln, k) => ctx.fillText(ln, r.x + pad, r.y + pad + big + 8 + k * fs * 1.3));
+  }
+}
+
+async function main() {
+  let id = params.get("run");
+  if (!id) {
+    const runs = await fetch("/api/runs").then((r) => r.json()).catch(() => []);
+    id = runs[0] && runs[0].id;
+  }
+  if (!id) { $("stage").innerHTML = `<div class="error">Aucune analyse. Lance d'abord une analyse depuis le dashboard.</div>`; return; }
+  const res = await fetch("/api/runs/" + encodeURIComponent(id));
+  if (!res.ok) { $("stage").innerHTML = `<div class="error">Analyse introuvable.</div>`; return; }
+  const run = await res.json();
+  $("back").href = "./?run=" + encodeURIComponent(id);
+
+  const thr = run.threshold ?? 0.5;
+  const relevant = run.comments.filter((c) => c.scores && c.scores.is_relevant >= 0.5);
+  const items = relevant.map((c) => ({ red: c.scores.is_unhappy >= thr, v: c.likes + 1, likes: c.likes, text: c.text }));
+  const red = items.filter((c) => c.red);
+  const pCount = 100 * red.length / (items.length || 1);
+  const pLikes = 100 * red.reduce((s, c) => s + c.v, 0) / (items.reduce((s, c) => s + c.v, 0) || 1);
+  const target = run.target === "the video or its creator" ? "la vidéo" : run.target;
+  const v = run.video;
+
+  $("kicker").textContent = `${nf.format(run.comments.length)} commentaires lus par une IA`;
+  $("headline").innerHTML = `<em>${pct(pCount)}</em> râlent.<span class="l2">Ils pèsent <em>${pct(pLikes)}</em>.</span>`;
+  $("thumb").src = v.thumbnail || "";
+  $("vtitle").textContent = `${v.title} · ${v.channel}`;
+  const verdict = pLikes < pCount * 0.6 ? "… mais presque personne ne les like."
+    : pLikes > pCount * 1.4 ? "… et ce sont eux que le public like le plus."
+    : "… et les likes vont dans le même sens.";
+  $("vsub").innerHTML = `<b class="num">${nf.format(red.length)}</b> commentaires critiquent ${esc(target)}${verdict}`;
+  $("pCount").textContent = pct(pCount);
+  $("pLikes").textContent = pct(pLikes);
+  $("legendRed").textContent = `Mécontent envers ${target} (score Jev ≥ ${thr.toLocaleString("fr-FR")})`;
+  const mins = run.elapsed < 90 ? `${Math.round(run.elapsed)} s` : `${Math.round(run.elapsed / 60)} min`;
+  const cost = (run.usage.input_tokens / 1e6) * JEV_PRICE_PER_M;
+  $("stats").innerHTML = `Analysé en <b>${mins}</b> pour <b>≈ ${cost.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} $</b>`;
+
+  $("poster").hidden = false;
+  fit();
+  await document.fonts.ready;
+  drawWaffle($("waffle"), items);
+  drawTree($("tree"), items);
+  document.body.dataset.ready = "1";
+}
+window.addEventListener("resize", fit);
+main();
+</script>
+</body>
+</html>

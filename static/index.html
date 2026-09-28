@@ -140,6 +140,9 @@ input.text { height: 48px; padding: 0 14px; font-size: 15px; background: var(--f
 .video .meta { font-size: 15px; color: var(--ink-2); }
 .context { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; background: var(--sunken); border-radius: 10px; font-size: 14px; color: var(--ink-3); max-width: 780px; }
 .context b { white-space: nowrap; }
+.poster-btn { margin-left: auto; flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 20px; border-radius: 12px; background: var(--accent); color: #fff; font-weight: 600; text-decoration: none; box-shadow: 0 6px 20px rgba(217, 69, 43, .3); }
+.poster-btn:hover { color: #fff; filter: brightness(1.08); }
+.poster-btn svg { stroke: #fff; }
 
 /* ---------- chiffres clés ---------- */
 .kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
@@ -260,6 +263,7 @@ input.text { height: 48px; padding: 0 14px; font-size: 15px; background: var(--f
   .vcount { margin-left: 0; }
   .video { flex-direction: column; align-items: stretch; }
   .video img { width: 100%; }
+  .poster-btn { margin-left: 0; justify-content: center; }
   .context { flex-direction: column; gap: 4px; }
   .hero { padding: 24px 20px; }
   .hero .big { font-size: 80px; }
@@ -351,6 +355,10 @@ input.text { height: 48px; padding: 0 14px; font-size: 15px; background: var(--f
         <div class="meta" id="vmeta"></div>
         <div class="context" id="vctx"><b>Contexte envoyé à Jev</b><span id="vctxText"></span></div>
       </div>
+      <a class="poster-btn" id="posterLink" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg>
+        Créer l'affiche
+      </a>
     </section>
 
     <section class="kpis">
@@ -673,6 +681,7 @@ function showRun(run) {
   const ctx = (run.context || "").split("Video summary:")[1];
   $("vctx").hidden = !ctx;
   $("vctxText").textContent = ctx ? ctx.trim() : "";
+  $("posterLink").href = "affiche.html?run=" + encodeURIComponent(run.id);
   $("dash").hidden = false;
   render();
 }

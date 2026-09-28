@@ -38,6 +38,13 @@ des commentaires filtrable, triable par mécontentement ou likes dans les deux s
 Thème clair et sombre, responsive. Les clés restent côté serveur ; chaque analyse est
 enregistrée dans `runs/`.
 
+### Affiche à partager
+
+Le bouton **Créer l'affiche** génère une image 1200 × 1500 (format portrait LinkedIn) :
+à gauche une mosaïque où chaque carré est un commentaire, à droite les mêmes commentaires
+en blocs proportionnels à leurs likes. On voit d'un coup d'œil si les mécontents sont
+nombreux, et s'ils sont soutenus. Page : `affiche.html?run=<id>`.
+
 ## Ligne de commande
 
 ```bash
