@@ -58,6 +58,16 @@ state: YouTube video "<titre>" by <chaîne>.
 
 `--no-context` désactive le contexte en ligne de commande.
 
+Le résumé n'est gardé que si Jev juge qu'un paragraphe de la description décrit vraiment la
+vidéo : les descriptions remplies de liens, de matériel ou de FAQ sont ignorées (titre seul).
+
+## Limites connues
+
+- YouTube ne renvoie qu'environ 1 000 commentaires triés par pertinence : au-delà, l'app
+  complète avec les plus récents. Les réponses aux commentaires ne sont pas analysées.
+- La latence de Jev varie beaucoup (0,3 à 15 s par appel) : les appels lents sont relancés
+  et 32 requêtes tournent en parallèle.
+
 ## Déploiement gratuit (Render)
 
 1. Sur [render.com](https://render.com), **New → Blueprint** et choisir ce repo (branche avec `render.yaml`).

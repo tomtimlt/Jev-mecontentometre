@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="220 170 860 920" role="img" aria-label="Logo Mécontentomètre">
+  <defs>
+    <mask id="logo-tri" maskUnits="userSpaceOnUse" x="220" y="170" width="860" height="920">
+      <polygon points="330,280 970,630 330,980" fill="#fff" stroke="#fff" stroke-width="150" stroke-linejoin="round"/>
+    </mask>
+    <mask id="logo-eye" maskUnits="userSpaceOnUse" x="220" y="170" width="860" height="920">
+      <rect x="220" y="170" width="860" height="920" fill="#fff"/>
+      <polygon points="560,380 960,380 960,640 840,612 620,527" fill="#000"/>
+    </mask>
+  </defs>
+  <polygon class="logo-edge" points="330,280 970,630 330,980" fill="#1A1A1A" stroke="#1A1A1A" stroke-width="150" stroke-linejoin="round"/>
+  <g mask="url(#logo-tri)">
+    <rect x="313" y="470" width="106" height="384" fill="#4A4845"/>
+    <rect x="445" y="626" width="106" height="228" fill="#4A4845"/>
+    <rect x="578" y="708" width="105" height="146" fill="#4A4845"/>
+    <rect x="707" y="749" width="97" height="105" fill="#E24C3A"/>
+  </g>
+  <circle cx="742" cy="578" r="65" fill="#ECE9E4" mask="url(#logo-eye)"/>
+  <polygon points="642,483 856,597 838,612 619,526" fill="#ECE9E4"/>
+</svg>

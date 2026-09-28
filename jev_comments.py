@@ -44,14 +44,60 @@ DEFAULT_TARGET = "the video or its creator"
 CONTEXT_HINT = " Judge only the comment, using the video context to understand what it refers to."
 
 
-def video_context(meta):
+SUMMARY_QUESTION = {
+    "describes_video": {
+        "type": "noul",
+        "instructions": "Does this text describe what this specific video is about (its topic, story or news)?",
+        "criteria": {
+            "true": "Summarizes the subject or content of the video",
+            "false": "Social media links, equipment, FAQ, credits, disclaimers, sponsor codes or other channel boilerplate",
+        },
+    },
+}
+
+
+def description_summary(description, jev_key, title="", limit=500, max_candidates=6, budget=14.0):
+    """Premier paragraphe de la description que Jev juge descriptif du contenu de la vidéo.
+
+    Les descriptions YouTube sont souvent remplies de liens, matériel ou FAQ : envoyer ça
+    comme contexte embrouille Jev. Renvoie "" si aucun paragraphe ne décrit la vidéo.
+    """
+    paras = [p.strip() for p in re.split(r"\n\s*\n|\n-{5,}\n?", description or "")]
+    paras = [p for p in paras if sum(ch.isalpha() for ch in p) >= 30][:max_candidates]
+    if not paras:
+        return ""
+
+    def judge(para):
+        state = f'Title of the video: "{title}"\n\nText from its description:\n{para[:1500]}'
+        try:
+            return score_state(state, jev_key, SUMMARY_QUESTION, retries=4, timeout=3)[0]["describes_video"]
+        except Exception:
+            return 0.0
+
+    # En parallèle, et on garde le premier paragraphe (dans l'ordre) validé par Jev.
+    # La latence de Jev varie (0,3 s à 15 s) : au-delà du budget, on se contente du titre.
+    ex = cf.ThreadPoolExecutor(len(paras))
+    futures = [ex.submit(judge, p) for p in paras]
+    deadline = time.time() + budget
+    try:
+        for para, fut in zip(paras, futures):
+            try:
+                if fut.result(timeout=max(0, deadline - time.time())) >= THRESHOLD:
+                    return " ".join(para.split())[:limit]
+            except cf.TimeoutError:
+                return ""
+        return ""
+    finally:
+        ex.shutdown(wait=False, cancel_futures=True)
+
+
+def video_context(meta, jev_key):
     """Contexte donné à Jev avec chaque commentaire : titre, chaîne et résumé de la vidéo.
 
-    Le résumé est le premier paragraphe de la description (avant liens et boilerplate).
     Mesuré dans eval/ : 79 % -> 95 % d'exactitude sur des commentaires ambigus.
     """
     ctx = f'YouTube video "{meta["title"]}" by {meta["channel"]}.'
-    summary = meta.get("description", "").strip().split("\n\n")[0][:500]
+    summary = description_summary(meta.get("description", ""), jev_key, meta["title"])
     return f"{ctx}\nVideo summary: {summary}" if summary else ctx
 
 
@@ -125,32 +171,50 @@ def fetch_video(vid, key):
 
 
 def fetch_comments(vid, key, limit):
-    comments, token = [], None
-    while len(comments) < limit:
-        params = {"part": "snippet", "videoId": vid, "maxResults": 100,
-                  "textFormat": "plainText", "order": "relevance"}
-        if token:
-            params["pageToken"] = token
-        data = yt_get("commentThreads", key, **params)
-        for item in data.get("items", []):
-            s = item["snippet"]["topLevelComment"]["snippet"]
-            comments.append({"text": s["textDisplay"], "likes": s.get("likeCount", 0),
-                             "author": s.get("authorDisplayName", ""),
-                             "published": s.get("publishedAt", "")})
-        token = data.get("nextPageToken")
-        if not token:
+    """Commentaires principaux, les plus pertinents d'abord.
+
+    L'ordre « relevance » de YouTube s'arrête vers ~1 000 commentaires : au-delà, on
+    complète avec l'ordre chronologique en ignorant ceux déjà récupérés.
+    """
+    comments, seen = [], set()
+    for order in ("relevance", "time"):
+        token = None
+        while len(comments) < limit:
+            params = {"part": "snippet", "videoId": vid, "maxResults": 100,
+                      "textFormat": "plainText", "order": order}
+            if token:
+                params["pageToken"] = token
+            data = yt_get("commentThreads", key, **params)
+            for item in data.get("items", []):
+                if item["id"] in seen:
+                    continue
+                seen.add(item["id"])
+                s = item["snippet"]["topLevelComment"]["snippet"]
+                comments.append({"text": s["textDisplay"], "likes": s.get("likeCount", 0),
+                                 "author": s.get("authorDisplayName", ""),
+                                 "published": s.get("publishedAt", "")})
+            token = data.get("nextPageToken")
+            if not token:
+                break
+        if len(comments) >= limit:
             break
     return comments[:limit]
 
 
 def score(text, key, questions, context=None, retries=5):
     state = f"{context}\n\nComment: {text[:4000]}" if context else text[:4000]
+    return score_state(state, key, questions, retries)
+
+
+def score_state(state, key, questions, retries=5, timeout=20):
+    """Un appel Jev. Sa latence varie beaucoup (0,3 s à 15 s pour la même requête) :
+    un appel qui dépasse `timeout` est relancé tout de suite, la relance répond en général vite."""
     body = json.dumps({"state": state, "model": "jev-latest", "questions": questions}).encode()
     for attempt in range(retries):
         req = urllib.request.Request(JEV_URL, data=body, method="POST", headers={
             "Authorization": f"Bearer {key}", "Content-Type": "application/json"})
         try:
-            with urllib.request.urlopen(req, timeout=30) as r:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
                 data = json.load(r)
             answers = {k: v["noul"] for k, v in data["answers"].items()}
             return answers, data.get("usage", {})
@@ -159,9 +223,10 @@ def score(text, key, questions, context=None, retries=5):
                 time.sleep(2 ** attempt)
                 continue
             raise
-        except urllib.error.URLError:
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
             if attempt < retries - 1:
-                time.sleep(2 ** attempt)
+                slow = isinstance(e, TimeoutError) or "timed out" in str(e)
+                time.sleep(0 if slow else 2 ** attempt)
                 continue
             raise
 
@@ -238,7 +303,7 @@ def main():
     p.add_argument("--target", default=DEFAULT_TARGET,
                    help='contre qui mesurer le mécontentement, ex. "Apple" (défaut : la vidéo ou son créateur)')
     p.add_argument("--max", type=int, default=500, help="nombre max de commentaires (défaut 500)")
-    p.add_argument("--workers", type=int, default=16, help="requêtes Jev en parallèle (défaut 16)")
+    p.add_argument("--workers", type=int, default=32, help="requêtes Jev en parallèle (défaut 32)")
     p.add_argument("--no-context", action="store_true",
                    help="ne pas donner le titre et le résumé de la vidéo à Jev")
     p.add_argument("--json", help="écrire le rapport + scores détaillés dans ce fichier")
@@ -259,7 +324,7 @@ def main():
     print(f"{len(comments)} commentaires récupérés.", file=sys.stderr)
 
     t0 = time.time()
-    context = None if args.no_context else video_context(meta)
+    context = None if args.no_context else video_context(meta, jev_key)
     usage, failed = score_all(comments, jev_key, build_questions(args.target, context is not None),
                               args.workers, context=context)
     r = report(comments)

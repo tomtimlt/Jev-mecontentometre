@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mécontentomètre</title>
-<link rel="icon" href="jev-logo.png">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Geist:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -78,6 +78,10 @@ button { cursor: pointer; }
 header { border-bottom: 1px solid var(--line); }
 .bar-inner { max-width: 1200px; margin: 0 auto; padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .brand { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; row-gap: 4px; }
+.site { display: flex; align-items: center; gap: 10px; }
+.site-logo { width: 44px; height: 44px; }
+:root[data-theme="dark"] .site-logo { filter: drop-shadow(0 0 1px rgba(242, 239, 231, .6)); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .site-logo { filter: drop-shadow(0 0 1px rgba(242, 239, 231, .6)); } }
 .brand h1 { margin: 0; font-size: 30px; line-height: 1; letter-spacing: -0.03em; }
 .brand .sep { width: 1px; height: 32px; background: var(--line); }
 .powered { display: flex; align-items: center; gap: 10px; color: var(--ink-2); font-size: 14px; }
@@ -239,7 +243,12 @@ input.text { height: 48px; padding: 0 14px; font-size: 15px; background: var(--f
 @media (max-width: 720px) {
   .brand .sep { display: none; }
   .brand { gap: 6px; flex-direction: column; align-items: flex-start; }
-  .brand h1 { font-size: 24px; }
+  .bar-inner { gap: 8px; padding: 12px; }
+  .brand { min-width: 0; }
+  .brand h1 { font-size: 21px; }
+  .site { gap: 8px; }
+  .site-logo { width: 30px; height: 30px; }
+  .icon-btn { width: 40px; height: 40px; }
   .powered { gap: 6px; font-size: 13px; }
   .powered img { width: 22px; height: 22px; }
   .powered b { font-size: 18px; }
@@ -277,7 +286,7 @@ input.text { height: 48px; padding: 0 14px; font-size: 15px; background: var(--f
 <header>
   <div class="bar-inner">
     <div class="brand">
-      <h1 class="display">Mécontentomètre</h1>
+      <div class="site"><img class="site-logo" src="logo.svg" alt=""><h1 class="display">Mécontentomètre</h1></div>
       <span class="sep" aria-hidden="true"></span>
       <div class="powered">propulsé par <img src="jev-logo.png" alt="Logo Jev"><b class="display">JEV</b></div>
     </div>
@@ -428,7 +437,7 @@ const compact = new Intl.NumberFormat("fr-FR", { notation: "compact", maximumFra
 const pct = (x) => x.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " %";
 const dec = (x) => x.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const TOKENS_PER_COMMENT = 730;   // mesuré : ~730 tokens d'entrée par commentaire avec le contexte vidéo
-const COMMENTS_PER_SECOND = 8;    // mesuré : ~300 commentaires en 38 s avec 16 requêtes parallèles
+const COMMENTS_PER_SECOND = 3.5;  // mesuré : 400 commentaires en ~110 s avec 32 requêtes parallèles (varie selon la charge de Jev)
 
 const state = { run: null, thr: 0.5, filter: "unhappy", sort: "score", dir: "desc", q: "", shown: 30,
                 count: "300", video: null };
@@ -474,6 +483,10 @@ function duration(n) {
   const s = Math.round(n / COMMENTS_PER_SECOND);
   return s < 90 ? `${s} secondes` : `${Math.round(s / 60)} minutes`;
 }
+function eta(s) {
+  s = Math.max(1, Math.round(s));
+  return s < 90 ? `${s} s` : `${Math.round(s / 60)} min`;
+}
 function renderCount() {
   const v = state.video, max = maxForVideo();
   document.querySelectorAll("#countSeg button").forEach((b) => {
@@ -492,7 +505,7 @@ function renderCount() {
   $("warn").hidden = !heavy || !n;
   if (heavy && n) {
     const capped = v && v.comment_count > v.max_comments;
-    $("warnText").innerHTML = `<b>Analyse de ${nf.format(n)} commentaires : environ ${duration(n)} et ${nf.format(Math.round(n * TOKENS_PER_COMMENT / 1000) * 1000)} tokens Jev.</b> `
+    $("warnText").innerHTML = `<b>Analyse de ${nf.format(n)} commentaires : jusqu'à ${duration(n)} selon la charge de Jev, et ${nf.format(Math.round(n * TOKENS_PER_COMMENT / 1000) * 1000)} tokens Jev.</b> `
       + "YouTube ne renvoie que les commentaires principaux, pas les réponses : le total analysé peut être inférieur."
       + (capped ? ` L'analyse est plafonnée à ${nf.format(v.max_comments)} commentaires.` : "");
   }
@@ -711,12 +724,16 @@ $("form").onsubmit = (e) => {
   $("go").disabled = true; $("error").hidden = true;
   $("progress").hidden = false; $("pmsg").textContent = "Démarrage…"; $("pfill").style.width = "0";
   es = new EventSource("/api/analyze?" + params);
+  let t0 = null;
   const stop = () => { es.close(); es = null; $("go").disabled = false; $("progress").hidden = true; };
   es.addEventListener("status", (ev) => { $("pmsg").textContent = JSON.parse(ev.data).message; });
   es.addEventListener("progress", (ev) => {
     const d = JSON.parse(ev.data);
+    if (t0 === null) t0 = { t: performance.now(), done: d.done };
+    const rate = (d.done - t0.done) / ((performance.now() - t0.t) / 1000);
+    const left = d.done > t0.done + 20 && rate > 0 ? ` · encore ~${eta((d.total - d.done) / rate)}` : "";
     $("pfill").style.width = (100 * d.done / d.total) + "%";
-    $("pmsg").innerHTML = `Jev analyse les commentaires : <span class="num">${nf.format(d.done)} / ${nf.format(d.total)}</span>`;
+    $("pmsg").innerHTML = `Jev analyse les commentaires : <span class="num">${nf.format(d.done)} / ${nf.format(d.total)}${left}</span>`;
   });
   es.addEventListener("done", (ev) => {
     stop(); const run = JSON.parse(ev.data); showRun(run);
