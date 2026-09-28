@@ -17,7 +17,7 @@ Récupère les commentaires d'une vidéo (API YouTube Data v3), fait noter chacu
 puis agrège :
 
 - % de commentaires mécontents (brut et pondéré par les likes), spam exclu
-- raisons du mécontentement : fond, créateur/marque, pub, clickbait, technique
+- raisons du mécontentement : comportement/valeurs, fond, pub, clickbait, technique
 - distribution des scores et liste des commentaires, filtrable et triable
 
 <p align="center">
