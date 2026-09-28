@@ -3,7 +3,12 @@
 
 Les clés API restent côté serveur (variables Youtube_V3 et TYPESAFE_API_KEY) ;
 le navigateur ne voit que les résultats. Chaque analyse est enregistrée dans runs/.
+
+Si APP_PASSWORD est défini, l'accès est protégé par authentification HTTP Basic
+(n'importe quel identifiant, mot de passe = APP_PASSWORD). À faire avant tout déploiement public.
 """
+import base64
+import hmac
 import argparse
 import json
 import os
@@ -21,6 +26,7 @@ ROOT = Path(__file__).resolve().parent
 STATIC = ROOT / "static"
 RUNS = ROOT / "runs"
 MAX_COMMENTS = 2000
+PASSWORD = os.environ.get("APP_PASSWORD", "")
 
 
 def run_analysis(video, target, limit, emit):
@@ -84,7 +90,25 @@ class Handler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def authorized(self):
+        if not PASSWORD:
+            return True
+        header = self.headers.get("Authorization", "")
+        if header.startswith("Basic "):
+            try:
+                _, _, pw = base64.b64decode(header[6:]).decode().partition(":")
+            except (ValueError, UnicodeDecodeError):
+                return False
+            return hmac.compare_digest(pw.encode(), PASSWORD.encode())
+        return False
+
     def do_GET(self):
+        if not self.authorized():
+            self.send_response(401)
+            self.send_header("WWW-Authenticate", 'Basic realm="Mecontentometre"')
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
         url = urlparse(self.path)
         if url.path == "/api/analyze":
             return self.analyze(parse_qs(url.query))
@@ -144,10 +168,10 @@ class Handler(SimpleHTTPRequestHandler):
 
 def main():
     p = argparse.ArgumentParser(description="Dashboard web jev_comments")
-    p.add_argument("--port", type=int, default=8000)
-    p.add_argument("--host", default="127.0.0.1")
+    p.add_argument("--port", type=int, default=int(os.environ.get("PORT", 8000)))
+    p.add_argument("--host", default="0.0.0.0" if "PORT" in os.environ else "127.0.0.1")
     args = p.parse_args()
-    print(f"Dashboard : http://{args.host}:{args.port}")
+    print(f"Dashboard : http://{args.host}:{args.port}" + ("" if PASSWORD else " (sans mot de passe)"), flush=True)
     ThreadingHTTPServer((args.host, args.port), Handler).serve_forever()
 
 

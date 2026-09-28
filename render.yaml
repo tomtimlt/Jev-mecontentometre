@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: mecontentometre
+    runtime: python
+    plan: free
+    buildCommand: "true"
+    startCommand: python3 server.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: TYPESAFE_API_KEY
+        sync: false
+      - key: Youtube_V3
+        sync: false
+      - key: APP_PASSWORD
+        sync: false

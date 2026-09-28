@@ -54,3 +54,14 @@ state: YouTube video "<titre>" by <chaîne>.
 | Résumé dans les instructions | 84-89 % | 0,95 |
 
 `--no-context` désactive le contexte en ligne de commande.
+
+## Déploiement gratuit (Render)
+
+1. Sur [render.com](https://render.com), **New → Blueprint** et choisir ce repo (branche avec `render.yaml`).
+2. Renseigner les variables demandées : `TYPESAFE_API_KEY`, `Youtube_V3` et **`APP_PASSWORD`**
+   (obligatoire en public, sinon n'importe qui consomme tes quotas).
+3. Ouvrir l'URL `https://<nom>.onrender.com` : le navigateur demande un identifiant
+   (n'importe lequel) et le mot de passe.
+
+Offre gratuite : le service s'endort après 15 min sans visite (environ 1 min pour se réveiller)
+et le disque n'est pas persistant, donc l'historique `runs/` est perdu à chaque redémarrage.
