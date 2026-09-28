@@ -1,4 +1,4 @@
-# Jev-test : % de mécontents dans les commentaires YouTube
+# Mécontentomètre : % de mécontents dans les commentaires YouTube, propulsé par Jev
 
 Récupère les commentaires d'une vidéo (API YouTube Data v3), fait noter chacun par
 [Jev](https://docs.typesafe.ai) (TypeSafe System One), puis agrège :
