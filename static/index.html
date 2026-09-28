@@ -3,352 +3,447 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mécontentomètre Jev</title>
+<title>Mécontentomètre</title>
+<link rel="icon" href="jev-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Geist:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   color-scheme: light;
-  --page: #f9f9f7;
-  --surface: #fcfcfb;
-  --surface-2: #f3f2ee;
-  --text: #0b0b0b;
-  --text-2: #52514e;
-  --muted: #898781;
-  --grid: #e1e0d9;
-  --axis: #c3c2b7;
-  --border: rgba(11, 11, 11, 0.10);
-  --series-1: #2a78d6;
-  --series-1-track: #cde2fb;
-  --neutral-mark: #c3c2b7;
-  --good: #0ca30c;
-  --warning: #fab219;
-  --serious: #ec835a;
-  --critical: #d03b3b;
-  --accent-ink: #1c5cab;
-  --radius: 12px;
+  --bg: #F5F3EE;
+  --surface: #FDFCF9;
+  --sunken: #EDEAE2;
+  --field: #F5F3EE;
+  --line: #E4E1D8;
+  --ink: #17160F;
+  --ink-2: #45433C;
+  --ink-3: #2E2C26;
+  --axis: #C9C5BA;
+  --accent: #D9452B;
+  --neutral-bar: #CFCBBF;
+  --tag-bg: #FBE3DD;
+  --tag-ink: #7A2413;
+  --hero-bg: #17160F;
+  --hero-line: #17160F;
+  --hero-ink: #F5F3EE;
+  --hero-2: #DEDAD0;
+  --hero-3: #CFCBBF;
+  --hero-track: #34322B;
+  --warn-bg: #FCEBD9;
+  --warn-line: #F0C9A2;
+  --warn-ink: #4A2A0E;
+  --warn-icon: #A4480F;
+  --btn-bg: #17160F;
+  --btn-ink: #F5F3EE;
+  --shine: rgba(255, 255, 255, 0.6);
+  --lvl-low: #2E8B57;
+  --lvl-mid: #E2A21B;
+  --lvl-high: #E8583D;
+  --lvl-crit: #D03B3B;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --page: #0d0d0d;
-    --surface: #1a1a19;
-    --surface-2: #232322;
-    --text: #ffffff;
-    --text-2: #c3c2b7;
-    --muted: #898781;
-    --grid: #2c2c2a;
-    --axis: #383835;
-    --border: rgba(255, 255, 255, 0.10);
-    --series-1: #3987e5;
-    --series-1-track: #184f95;
-    --neutral-mark: #52514e;
-    --accent-ink: #86b6ef;
+    --bg: #11110F; --surface: #1A1A18; --sunken: #262521; --field: #141412; --line: #2E2D29;
+    --ink: #F2EFE7; --ink-2: #BDB9AE; --ink-3: #D9D5CA; --axis: #3A3934;
+    --accent: #E8583D; --neutral-bar: #4A4842; --tag-bg: #3A1D16; --tag-ink: #F4B7A6;
+    --hero-bg: #1F1E1B; --hero-line: #33322D; --hero-track: #3A3833;
+    --warn-bg: #3A2715; --warn-line: #6B4520; --warn-ink: #F6D9B8; --warn-icon: #F0A45C;
+    --btn-bg: #F2EFE7; --btn-ink: #11110F; --shine: rgba(255, 255, 255, 0.35);
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --page: #0d0d0d;
-  --surface: #1a1a19;
-  --surface-2: #232322;
-  --text: #ffffff;
-  --text-2: #c3c2b7;
-  --muted: #898781;
-  --grid: #2c2c2a;
-  --axis: #383835;
-  --border: rgba(255, 255, 255, 0.10);
-  --series-1: #3987e5;
-  --series-1-track: #184f95;
-  --neutral-mark: #52514e;
-  --accent-ink: #86b6ef;
+  --bg: #11110F; --surface: #1A1A18; --sunken: #262521; --field: #141412; --line: #2E2D29;
+  --ink: #F2EFE7; --ink-2: #BDB9AE; --ink-3: #D9D5CA; --axis: #3A3934;
+  --accent: #E8583D; --neutral-bar: #4A4842; --tag-bg: #3A1D16; --tag-ink: #F4B7A6;
+  --hero-bg: #1F1E1B; --hero-line: #33322D; --hero-track: #3A3833;
+  --warn-bg: #3A2715; --warn-line: #6B4520; --warn-ink: #F6D9B8; --warn-icon: #F0A45C;
+  --btn-bg: #F2EFE7; --btn-ink: #11110F; --shine: rgba(255, 255, 255, 0.35);
 }
 
 * { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: var(--page);
-  color: var(--text);
-  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 "Geist", system-ui, sans-serif; }
+a { color: var(--ink); }
+a:hover { color: var(--accent); }
+button, input, select { font: inherit; color: var(--ink); }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num { font-family: "Space Grotesk", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+.display { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 800; letter-spacing: -0.02em; }
+[hidden] { display: none !important; }
+
+/* ---------- en-tête ---------- */
+header { border-bottom: 1px solid var(--line); }
+.bar-inner { max-width: 1200px; margin: 0 auto; padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.brand { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; row-gap: 4px; }
+.brand h1 { margin: 0; font-size: 30px; line-height: 1; letter-spacing: -0.03em; }
+.brand .sep { width: 1px; height: 32px; background: var(--line); }
+.powered { display: flex; align-items: center; gap: 10px; color: var(--ink-2); font-size: 14px; }
+.powered img { width: 40px; height: 40px; border-radius: 50%; }
+.powered b { font-size: 30px; line-height: 1; color: var(--ink); }
+nav { display: flex; align-items: center; gap: 4px; }
+nav a, .hist-btn { font-size: 15px; text-decoration: none; padding: 11px 14px; border-radius: 10px; background: none; border: 0; }
+nav a:hover, .hist-btn:hover { background: var(--sunken); color: var(--ink); }
+.icon-btn { width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); display: inline-flex; align-items: center; justify-content: center; }
+.icon-btn svg, nav svg { stroke: var(--ink); }
+.history { position: relative; }
+.history-panel { position: absolute; right: 0; top: 50px; z-index: 5; width: min(420px, calc(100vw - 32px)); max-height: 360px; overflow: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 12px 32px rgba(0,0,0,.14); padding: 6px; }
+.history-panel button { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; text-align: left; padding: 10px 12px; border: 0; border-radius: 10px; background: none; }
+.history-panel button:hover { background: var(--sunken); }
+.history-panel .t { font-weight: 500; }
+.history-panel .m { font-size: 13px; color: var(--ink-2); }
+.history-panel .empty { padding: 12px; color: var(--ink-2); }
+
+main { max-width: 1200px; margin: 0 auto; padding: 32px 16px 64px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+h2 { margin: 0; font-size: 22px; }
+.sub { margin: 4px 0 0; font-size: 14px; color: var(--ink-2); }
+
+/* ---------- formulaire ---------- */
+form.card { display: flex; flex-direction: column; gap: 16px; padding: 20px; }
+.row { display: flex; align-items: flex-end; gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--ink-2); min-width: 0; }
+.field.grow { flex: 1; }
+.field.target { width: 280px; }
+input.text { height: 48px; padding: 0 14px; font-size: 15px; background: var(--field); border: 1px solid var(--line); border-radius: 10px; width: 100%; }
+.primary { height: 48px; padding: 0 28px; border: 0; border-radius: 10px; background: var(--btn-bg); color: var(--btn-ink); font-weight: 600; }
+.primary:disabled { opacity: .55; cursor: progress; }
+.count-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.count-row .lbl { font-size: 14px; font-weight: 500; }
+.seg { display: flex; padding: 4px; background: var(--field); border: 1px solid var(--line); border-radius: 12px; gap: 2px; }
+.seg button { height: 36px; padding: 0 14px; border: 0; border-radius: 8px; background: transparent; font-size: 14px; font-weight: 500; color: var(--ink-3); white-space: nowrap; }
+.seg button[aria-pressed="true"] { background: var(--btn-bg); color: var(--btn-ink); font-weight: 600; }
+.seg button:disabled { opacity: .4; cursor: not-allowed; }
+.custom { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ink-2); }
+.custom input { width: 100px; height: 40px; padding: 0 10px; font-size: 15px; font-weight: 600; background: var(--surface); border: 1px solid var(--ink); border-radius: 10px; }
+.vcount { margin-left: auto; font-size: 14px; color: var(--ink-2); }
+.vcount b { color: var(--ink); }
+.warn { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: 12px; font-size: 14px; color: var(--warn-ink); }
+.warn svg { flex-shrink: 0; margin-top: 2px; stroke: var(--warn-icon); }
+.progress { display: flex; flex-direction: column; gap: 10px; }
+.progress .msg { font-size: 14px; font-weight: 500; }
+.track { height: 10px; border-radius: 5px; background: var(--sunken); overflow: hidden; }
+.track > div { height: 100%; width: 0; border-radius: 5px; background: var(--accent); transition: width .25s; }
+.error { border-color: var(--lvl-crit); color: var(--ink); }
+
+/* ---------- vidéo ---------- */
+.video { display: flex; gap: 24px; align-items: center; }
+.video img { width: 208px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 12px; background: var(--sunken); flex-shrink: 0; }
+.video .info { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.video .title { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; text-decoration: none; }
+.video .meta { font-size: 15px; color: var(--ink-2); }
+.context { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; background: var(--sunken); border-radius: 10px; font-size: 14px; color: var(--ink-3); max-width: 780px; }
+.context b { white-space: nowrap; }
+
+/* ---------- chiffres clés ---------- */
+.kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.hero { padding: 32px; background: var(--hero-bg); color: var(--hero-ink); border: 1px solid var(--hero-line); border-radius: 20px; display: flex; flex-direction: column; gap: 18px; }
+.hero .lbl { font-size: 15px; font-weight: 500; color: var(--hero-2); }
+.hero .big { font-size: 120px; line-height: .85; letter-spacing: -0.05em; }
+.hero .big small { font-size: 56px; letter-spacing: 0; }
+.hero .phrase { font-size: 18px; line-height: 1.4; color: var(--hero-2); max-width: 470px; margin: 0; }
+.hero .phrase b { color: #fff; }
+.meter { height: 10px; border-radius: 5px; background: var(--hero-track); display: flex; }
+.scale { display: flex; justify-content: space-between; font-size: 13px; color: var(--hero-3); margin-top: 10px; }
+.level { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; }
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.tile { padding: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; display: flex; flex-direction: column; gap: 8px; }
+.tile .lbl { font-size: 15px; font-weight: 500; }
+.tile .val { font-size: 44px; line-height: 1.1; letter-spacing: -0.03em; }
+.tile .note { font-size: 14px; color: var(--ink-2); }
+
+/* ---------- graphiques ---------- */
+.charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.chart { display: flex; flex-direction: column; gap: 20px; }
+.reasons { display: flex; flex-direction: column; gap: 16px; }
+.reason { display: flex; flex-direction: column; gap: 7px; }
+.reason .top { display: flex; justify-content: space-between; gap: 12px; font-size: 15px; }
+.reason .top .num { font-weight: 600; }
+.rtrack { height: 12px; border-radius: 6px; background: var(--sunken); display: flex; }
+
+@keyframes grow-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes grow-y { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes sweep-x { 0% { transform: translateX(-120%); } 60%, 100% { transform: translateX(320%); } }
+@keyframes sweep-y { 0% { transform: translateY(120%); } 60%, 100% { transform: translateY(-320%); } }
+.fill { position: relative; overflow: hidden; height: 100%; border-radius: inherit; background: var(--accent); transform-origin: left center; animation: grow-x 1s cubic-bezier(.2, .8, .2, 1) both; }
+.fill::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 35%; background: linear-gradient(90deg, transparent, var(--shine), transparent); animation: sweep-x 3.2s ease-in-out 1.1s infinite; }
+.meter .fill { background: var(--lvl-color, var(--lvl-high)); }
+
+.hist-wrap { display: flex; gap: 10px; }
+.yaxis { position: relative; width: 26px; height: 200px; font-size: 13px; color: var(--ink-2); text-align: right; }
+.yaxis span { position: absolute; right: 0; transform: translateY(-50%); }
+.plot { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.cols { position: relative; height: 200px; display: flex; align-items: flex-end; gap: 3px; border-bottom: 1px solid var(--axis); }
+.gridline { position: absolute; left: 0; right: 0; border-top: 1px solid var(--line); pointer-events: none; }
+.col { flex: 1; height: 100%; display: flex; align-items: flex-end; position: relative; z-index: 1; }
+.col > div { width: 100%; border-radius: 4px 4px 0 0; background: var(--neutral-bar); transform-origin: bottom center; animation: grow-y .8s cubic-bezier(.2, .8, .2, 1) both; }
+.col.hot > div { background: var(--accent); position: relative; overflow: hidden; }
+.col.hot > div::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 40%; background: linear-gradient(0deg, transparent, var(--shine), transparent); animation: sweep-y 2.8s ease-in-out 1.2s infinite; }
+.col:hover > div { filter: brightness(1.1); }
+.thr { position: absolute; top: -4px; bottom: 0; border-left: 2px solid var(--ink); z-index: 2; pointer-events: none; }
+.xaxis { position: relative; height: 18px; font-size: 13px; color: var(--ink-2); }
+.xaxis span { position: absolute; transform: translateX(-50%); }
+.xaxis span:first-child { transform: none; }
+.xaxis span:last-child { transform: translateX(-100%); }
+.threshold { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--ink-2); width: 180px; }
+.threshold input { accent-color: var(--ink); }
+.legend { display: flex; gap: 20px; flex-wrap: wrap; font-size: 14px; color: var(--ink-3); }
+.legend span { display: flex; align-items: center; gap: 8px; }
+.legend i { width: 12px; height: 12px; border-radius: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fill, .col > div { animation: none; }
+  .fill::after, .col.hot > div::after { display: none; }
 }
-.wrap { max-width: 1180px; margin: 0 auto; padding: 20px 16px 48px; }
-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
-h1 { font-size: 20px; margin: 0; font-weight: 650; letter-spacing: -0.01em; }
-h1 span { color: var(--muted); font-weight: 500; }
-h2 { font-size: 15px; margin: 0 0 2px; font-weight: 600; }
-.sub { color: var(--text-2); font-size: 13px; margin: 0 0 14px; }
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px;
+
+/* ---------- commentaires ---------- */
+.comments { display: flex; flex-direction: column; gap: 18px; }
+.chead, .ctools { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.search { position: relative; display: flex; align-items: center; }
+.search svg { position: absolute; left: 13px; stroke: var(--ink-2); }
+.search input { height: 44px; width: 280px; max-width: 100%; padding: 0 14px 0 38px; font-size: 15px; background: var(--field); border: 1px solid var(--line); border-radius: 999px; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: transparent; font-size: 15px; }
+.chip b { font-family: "Space Grotesk", sans-serif; margin-left: 4px; }
+.chip[aria-pressed="true"] { background: var(--btn-bg); color: var(--btn-ink); border-color: transparent; }
+.sort { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ink-2); }
+.dir { height: 44px; padding: 0 14px; display: flex; align-items: center; gap: 8px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); font-size: 14px; font-weight: 500; }
+.dir svg { stroke: var(--ink); transition: transform .2s; }
+.dir[data-dir="asc"] svg { transform: rotate(180deg); }
+.list { display: flex; flex-direction: column; }
+.item { display: grid; grid-template-columns: 130px minmax(0, 1fr) 100px; gap: 20px; padding: 18px 0; border-top: 1px solid var(--sunken); align-items: start; }
+.score { display: flex; flex-direction: column; gap: 8px; }
+.score .num { font-size: 22px; font-weight: 700; }
+.mini { height: 6px; width: 90px; border-radius: 3px; background: var(--sunken); display: flex; }
+.mini .fill { animation-duration: .7s; }
+.mini .fill::after { display: none; }
+.item.dim .mini .fill { background: var(--neutral-bar); }
+.item p { margin: 0; font-size: 16px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.byline { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; font-size: 14px; color: var(--ink-2); }
+.tag { padding: 4px 10px; border-radius: 999px; background: var(--tag-bg); color: var(--tag-ink); font-size: 13px; font-weight: 500; }
+.tag.spam { background: var(--sunken); color: var(--ink-2); }
+.likes { display: flex; justify-content: flex-end; align-items: center; gap: 6px; font-size: 16px; font-weight: 600; }
+.likes svg { stroke: var(--ink); }
+.more { align-self: flex-start; height: 44px; padding: 0 18px; border-radius: 10px; border: 1px solid var(--line); background: transparent; }
+.none { padding: 20px 0; color: var(--ink-2); }
+
+#tip { position: fixed; z-index: 10; pointer-events: none; display: none; max-width: 260px; padding: 8px 11px; border-radius: 8px; background: var(--btn-bg); color: var(--btn-ink); font-size: 13px; box-shadow: 0 6px 18px rgba(0,0,0,.2); }
+
+/* ---------- responsive ---------- */
+@media (max-width: 960px) {
+  .kpis, .charts { grid-template-columns: minmax(0, 1fr); }
+  .hero .big { font-size: 96px; }
 }
-button, input, select {
-  font: inherit; color: var(--text);
-  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-}
-input, select { padding: 9px 11px; min-width: 0; }
-input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--series-1); outline-offset: 1px; }
-button { padding: 9px 14px; cursor: pointer; }
-button.primary { background: var(--text); color: var(--page); border-color: transparent; font-weight: 600; }
-button.primary:disabled { opacity: .5; cursor: progress; }
-.ghost { background: transparent; }
-
-form.controls { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.2fr) auto auto; gap: 8px; align-items: end; }
-form.controls label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-2); }
-.history { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; color: var(--text-2); }
-.history select { flex: 1; max-width: 520px; padding: 6px 9px; font-size: 13px; }
-
-#progress { margin-top: 16px; display: none; }
-#progress.on { display: block; }
-.pbar { height: 8px; border-radius: 4px; background: var(--series-1-track); overflow: hidden; margin-top: 10px; }
-.pbar > div { height: 100%; width: 0; background: var(--series-1); border-radius: 4px; transition: width .2s; }
-#error { display: none; margin-top: 16px; border-color: var(--critical); }
-#error.on { display: block; }
-
-#dash { display: none; margin-top: 16px; }
-#dash.on { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
-
-.video { display: flex; gap: 16px; align-items: center; }
-.video img { width: 168px; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px; flex: none; background: var(--surface-2); }
-.video .t { font-weight: 600; font-size: 16px; margin: 0 0 4px; }
-.video .m { color: var(--text-2); font-size: 13px; }
-.video a { color: inherit; }
-.threshold { margin-left: auto; display: flex; flex-direction: column; gap: 4px; min-width: 190px; font-size: 12px; color: var(--text-2); }
-.threshold input { padding: 0; accent-color: var(--series-1); }
-
-.kpis { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 16px; }
-.kpi .label { color: var(--text-2); font-size: 13px; }
-.kpi .value { font-size: 28px; font-weight: 600; margin-top: 4px; }
-.kpi .note { color: var(--muted); font-size: 12px; margin-top: 2px; }
-.hero .value { font-size: 56px; line-height: 1.05; letter-spacing: -0.02em; }
-.meter { height: 8px; border-radius: 4px; background: var(--surface-2); margin: 12px 0 8px; overflow: hidden; }
-.meter > div { height: 100%; border-radius: 4px; }
-.level { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text); }
-.level i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-
-.charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-
-/* Barres horizontales : raisons */
-.hbars { display: grid; gap: 14px; }
-.hbar { display: grid; grid-template-columns: minmax(0, 180px) minmax(0, 1fr); gap: 12px; align-items: center; cursor: default; }
-.hbar .name { font-size: 13px; color: var(--text); }
-.hbar .track { display: flex; align-items: center; gap: 8px; height: 24px; border-radius: 0 4px 4px 0; }
-.hbar .fill { height: 20px; background: var(--series-1); border-radius: 0 4px 4px 0; min-width: 2px; }
-.hbar .val { font-size: 13px; color: var(--text-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.hbar:hover .fill { filter: brightness(1.1); }
-.baseline-wrap { border-left: 1px solid var(--axis); }
-
-/* Histogramme */
-.hist { position: relative; height: 200px; margin: 26px 0 0 34px; border-bottom: 1px solid var(--axis); }
-.hist .gridline { position: absolute; left: 0; right: 0; border-top: 1px solid var(--grid); }
-.hist .ytick { position: absolute; left: -34px; width: 28px; text-align: right; font-size: 11px; color: var(--muted); transform: translateY(-50%); font-variant-numeric: tabular-nums; }
-.hist .cols { position: absolute; inset: 0; display: flex; align-items: flex-end; gap: 2px; }
-.hist .col { flex: 1; height: 100%; display: flex; align-items: flex-end; }
-.hist .col > div { width: 100%; border-radius: 4px 4px 0 0; min-height: 0; }
-.hist .col:hover > div { filter: brightness(1.1); }
-.hist .thr { position: absolute; top: -6px; bottom: 0; border-left: 2px solid var(--text); pointer-events: none; }
-.hist .thr span { position: absolute; top: -16px; left: 4px; font-size: 11px; color: var(--text); white-space: nowrap; }
-.xticks { position: relative; height: 18px; margin-left: 34px; font-size: 11px; color: var(--muted); }
-.xticks span { position: absolute; transform: translateX(-50%); top: 4px; }
-.legend { display: flex; gap: 16px; font-size: 12px; color: var(--text-2); margin-top: 12px; }
-.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
-
-/* Tableau */
-.tbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
-.chips { display: flex; gap: 4px; flex-wrap: wrap; }
-.chip { padding: 6px 11px; border-radius: 999px; font-size: 13px; background: transparent; }
-.chip[aria-pressed="true"] { background: var(--text); color: var(--page); border-color: transparent; }
-.chip .n { opacity: .7; margin-left: 4px; font-variant-numeric: tabular-nums; }
-.tbar input { flex: 1; min-width: 160px; }
-table { width: 100%; border-collapse: collapse; }
-th { text-align: left; font-weight: 500; font-size: 12px; color: var(--text-2); padding: 8px; border-bottom: 1px solid var(--axis); white-space: nowrap; }
-th.sortable { cursor: pointer; user-select: none; }
-th.sortable:hover { color: var(--text); }
-td { padding: 10px 8px; border-bottom: 1px solid var(--grid); vertical-align: top; }
-td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--text-2); }
-td.score { width: 120px; }
-.mini { display: flex; align-items: center; gap: 8px; font-variant-numeric: tabular-nums; font-size: 13px; }
-.mini .bar { width: 56px; height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
-.mini .bar > div { height: 100%; background: var(--series-1); border-radius: 3px; }
-.mini.dim .bar > div { background: var(--neutral-mark); }
-.ctext { white-space: pre-wrap; word-break: break-word; }
-.author { color: var(--muted); font-size: 12px; margin-top: 2px; }
-.tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
-.tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--text-2); }
-.tag.spam { border: 1px solid var(--border); background: transparent; }
-.more { margin-top: 12px; }
-.empty { color: var(--muted); padding: 16px 8px; }
-
-#tip {
-  position: fixed; pointer-events: none; z-index: 10; display: none;
-  background: var(--text); color: var(--page);
-  padding: 7px 10px; border-radius: 8px; font-size: 12px; max-width: 260px;
-  box-shadow: 0 4px 16px rgba(0,0,0,.18);
-}
-#tip b { display: block; font-weight: 600; margin-bottom: 1px; }
-.footer { color: var(--muted); font-size: 12px; }
-
-@media (max-width: 860px) {
-  form.controls { grid-template-columns: 1fr 1fr; }
-  form.controls label:first-child { grid-column: 1 / -1; }
-  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .hero { grid-column: 1 / -1; }
-  .charts { grid-template-columns: minmax(0, 1fr); }
-  .video { flex-wrap: wrap; }
-  .threshold { margin-left: 0; width: 100%; }
-}
-@media (max-width: 520px) {
+@media (max-width: 720px) {
+  .brand .sep { display: none; }
+  .brand { gap: 6px; flex-direction: column; align-items: flex-start; }
+  .brand h1 { font-size: 24px; }
+  .powered { gap: 6px; font-size: 13px; }
+  .powered img { width: 22px; height: 22px; }
+  .powered b { font-size: 18px; }
+  nav .txt { display: none; }
+  .row { flex-direction: column; align-items: stretch; }
+  .field.target { width: auto; }
+  .seg { width: 100%; }
+  .seg button { flex: 1; padding: 0 6px; }
+  .vcount { margin-left: 0; }
+  .video { flex-direction: column; align-items: stretch; }
   .video img { width: 100%; }
-  .hbar { grid-template-columns: 1fr; gap: 4px; }
-  td.num.likes-col, th.likes-col { display: none; }
-  .hero .value { font-size: 48px; }
+  .context { flex-direction: column; gap: 4px; }
+  .hero { padding: 24px 20px; }
+  .hero .big { font-size: 80px; }
+  .hero .big small { font-size: 40px; }
+  .tiles { gap: 10px; }
+  .tile { padding: 16px; }
+  .tile .val { font-size: 32px; }
+  .tile .note { display: none; }
+  .card { padding: 20px; }
+  .item { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
+  .item .score { flex-direction: row; align-items: center; gap: 10px; }
+  .item .body { grid-column: 1 / -1; grid-row: 2; }
+  .search, .search input { width: 100%; }
+  .sort { width: 100%; }
+  .sort .seg { flex: 1; }
+  .sort > span:first-child, #dirLabel { display: none; }
+  .dir { width: 44px; padding: 0; justify-content: center; flex-shrink: 0; }
+  nav a, .hist-btn { padding: 10px; }
+  nav { gap: 0; }
 }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1>Mécontentomètre <span>· Jev</span></h1>
-    <button class="ghost" id="theme" type="button" aria-label="Changer de thème">◐ Thème</button>
-  </header>
+<header>
+  <div class="bar-inner">
+    <div class="brand">
+      <h1 class="display">Mécontentomètre</h1>
+      <span class="sep" aria-hidden="true"></span>
+      <div class="powered">propulsé par <img src="jev-logo.png" alt="Logo Jev"><b class="display">JEV</b></div>
+    </div>
+    <nav>
+      <div class="history">
+        <button type="button" class="hist-btn" id="histBtn" aria-expanded="false" aria-controls="histPanel">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>
+          <span class="txt">Historique</span>
+        </button>
+        <div class="history-panel" id="histPanel" hidden></div>
+      </div>
+      <a href="https://github.com/tomtimlt/Jev-test" target="_blank" rel="noopener" aria-label="Code source sur GitHub"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg> <span class="txt">GitHub</span></a>
+      <button type="button" class="icon-btn" id="theme" aria-label="Changer de thème">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
 
-  <section class="card">
-    <form class="controls" id="form">
-      <label>Vidéo YouTube (URL ou ID)
-        <input id="video" required placeholder="https://www.youtube.com/watch?v=…" autocomplete="off">
+<main>
+  <form class="card" id="form">
+    <div class="row">
+      <label class="field grow">Vidéo YouTube
+        <input class="text" id="video" required placeholder="https://www.youtube.com/watch?v=…" autocomplete="off">
       </label>
-      <label>Mécontentement envers
-        <input id="target" placeholder="la vidéo ou son créateur" autocomplete="off">
-      </label>
-      <label>Commentaires
-        <select id="max">
-          <option>100</option><option selected>300</option><option>500</option><option>1000</option><option>2000</option>
-        </select>
+      <label class="field target">Mécontentement envers
+        <input class="text" id="target" placeholder="la vidéo ou son créateur" autocomplete="off">
       </label>
       <button class="primary" id="go" type="submit">Analyser</button>
-    </form>
-    <div class="history">
-      <span>Historique</span>
-      <select id="runs" aria-label="Analyses précédentes"><option value="">—</option></select>
     </div>
-    <div id="progress">
-      <div id="pmsg" class="sub" style="margin:0"></div>
-      <div class="pbar"><div id="pfill"></div></div>
-    </div>
-  </section>
-
-  <section class="card" id="error" role="alert"></section>
-
-  <main id="dash">
-    <section class="card video">
-      <img id="vthumb" alt="">
-      <div>
-        <p class="t"><a id="vtitle" target="_blank" rel="noopener"></a></p>
-        <div class="m" id="vmeta"></div>
-        <div class="m" id="vtarget" style="margin-top:4px"></div>
+    <div class="count-row">
+      <span class="lbl">Commentaires à analyser</span>
+      <div class="seg" role="group" aria-label="Nombre de commentaires" id="countSeg">
+        <button type="button" data-c="100" aria-pressed="false">100</button>
+        <button type="button" data-c="300" aria-pressed="true">300</button>
+        <button type="button" data-c="custom" aria-pressed="false">Personnalisé</button>
+        <button type="button" data-c="all" aria-pressed="false" id="allBtn">Tout</button>
       </div>
-      <label class="threshold">
-        <span>Seuil de décision : <b id="thrv"></b></span>
-        <input type="range" id="thr" min="0.2" max="0.8" step="0.05">
+      <label class="custom" id="customBox" hidden>
+        <input type="number" id="customN" min="1" value="200" aria-label="Nombre de commentaires personnalisé" class="num">
+        <span id="customMax"></span>
       </label>
+      <span class="vcount" id="vcount" hidden></span>
+    </div>
+    <div class="warn" id="warn" role="note" hidden>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+      <div id="warnText"></div>
+    </div>
+    <div class="progress" id="progress" hidden>
+      <div class="msg" id="pmsg"></div>
+      <div class="track"><div id="pfill"></div></div>
+    </div>
+  </form>
+
+  <section class="card error" id="error" role="alert" hidden></section>
+
+  <div id="dash" hidden style="display:grid;gap:24px;grid-template-columns:minmax(0,1fr)">
+    <section class="video">
+      <img id="vthumb" alt="">
+      <div class="info">
+        <a class="title" id="vtitle" target="_blank" rel="noopener"></a>
+        <div class="meta" id="vmeta"></div>
+        <div class="context" id="vctx"><b>Contexte envoyé à Jev</b><span id="vctxText"></span></div>
+      </div>
     </section>
 
     <section class="kpis">
-      <div class="card kpi hero">
-        <div class="label">Commentaires mécontents</div>
-        <div class="value" id="k-pct"></div>
-        <div class="meter"><div id="k-meter"></div></div>
-        <span class="level" id="k-level"></span>
-        <div class="note" id="k-count"></div>
+      <div class="hero">
+        <div class="lbl">Taux de mécontentement</div>
+        <div class="big display" id="kPct"></div>
+        <p class="phrase" id="kPhrase"></p>
+        <div>
+          <div class="meter"><div class="fill" id="kMeter"></div></div>
+          <div class="scale num"><span>0</span><span>Faible · 15</span><span>Modéré · 35</span><span>Élevé · 60</span><span>100</span></div>
+        </div>
+        <div class="level" id="kLevel"></div>
       </div>
-      <div class="card kpi">
-        <div class="label">Pondéré par les likes</div>
-        <div class="value" id="k-weighted"></div>
-        <div class="note">poids d'un commentaire = likes + 1</div>
-      </div>
-      <div class="card kpi">
-        <div class="label">Score moyen de mécontentement</div>
-        <div class="value" id="k-mean"></div>
-        <div class="note">de 0 (satisfait) à 1 (mécontent)</div>
-      </div>
-      <div class="card kpi">
-        <div class="label">Commentaires analysés</div>
-        <div class="value" id="k-n"></div>
-        <div class="note" id="k-spam"></div>
+      <div class="tiles">
+        <div class="tile"><div class="lbl">Pondéré par les likes</div><div class="val display" id="kWeighted"></div><div class="note" id="kWeightedNote"></div></div>
+        <div class="tile"><div class="lbl">Score moyen</div><div class="val display" id="kMean"></div><div class="note">0 = satisfait, 1 = mécontent</div></div>
+        <div class="tile"><div class="lbl">Commentaires analysés</div><div class="val display" id="kN"></div><div class="note" id="kSpam"></div></div>
+        <div class="tile"><div class="lbl">Temps d'analyse</div><div class="val display" id="kTime"></div><div class="note">un appel Jev par commentaire</div></div>
       </div>
     </section>
 
     <section class="charts">
-      <div class="card">
-        <h2>Raisons du mécontentement</h2>
-        <p class="sub">Part des commentaires mécontents qui citent chaque raison (cumulables)</p>
-        <div class="hbars" id="reasons"></div>
+      <div class="card chart">
+        <div><h2 class="display">Pourquoi ils sont mécontents</h2><p class="sub" id="reasonsSub"></p></div>
+        <div class="reasons" id="reasons"></div>
       </div>
-      <div class="card">
-        <h2>Distribution des scores de mécontentement</h2>
-        <p class="sub">Nombre de commentaires par tranche de score Jev (spam exclu)</p>
-        <div class="hist" id="hist"></div>
-        <div class="xticks" id="xticks"></div>
-        <div class="legend">
-          <span><i style="background:var(--series-1)"></i>Compté comme mécontent</span>
-          <span><i style="background:var(--neutral-mark)"></i>Sous le seuil</span>
+      <div class="card chart">
+        <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div><h2 class="display">Distribution des scores</h2><p class="sub">Nombre de commentaires par score Jev</p></div>
+          <label class="threshold">Seuil : <b class="num" id="thrv" style="color:var(--ink)"></b>
+            <input type="range" id="thr" min="0.2" max="0.8" step="0.05">
+          </label>
         </div>
+        <div class="hist-wrap">
+          <div class="yaxis num" id="yaxis"></div>
+          <div class="plot">
+            <div class="cols" id="cols"></div>
+            <div class="xaxis num"><span style="left:0">0</span><span style="left:25%">0,25</span><span style="left:50%">0,50</span><span style="left:75%">0,75</span><span style="left:100%">1</span></div>
+          </div>
+        </div>
+        <div class="legend"><span><i style="background:var(--accent)"></i>Compté mécontent</span><span><i style="background:var(--neutral-bar)"></i>Sous le seuil</span></div>
       </div>
     </section>
 
-    <section class="card">
-      <h2>Commentaires</h2>
-      <p class="sub">Clique sur un en-tête pour trier</p>
-      <div class="tbar">
-        <div class="chips" id="filters" role="group" aria-label="Filtre">
-          <button type="button" class="chip" data-f="all" aria-pressed="true">Tous<span class="n"></span></button>
-          <button type="button" class="chip" data-f="unhappy" aria-pressed="false">Mécontents<span class="n"></span></button>
-          <button type="button" class="chip" data-f="ok" aria-pressed="false">Neutres / positifs<span class="n"></span></button>
-          <button type="button" class="chip" data-f="spam" aria-pressed="false">Spam / hors sujet<span class="n"></span></button>
+    <section class="card comments">
+      <div class="chead">
+        <h2 class="display">Commentaires</h2>
+        <label class="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" id="q" aria-label="Rechercher un commentaire" placeholder="Rechercher un commentaire">
+        </label>
+      </div>
+      <div class="ctools">
+        <div class="chips" role="group" aria-label="Filtre" id="filters">
+          <button type="button" class="chip" data-f="all">Tous<b></b></button>
+          <button type="button" class="chip" data-f="unhappy">Mécontents<b></b></button>
+          <button type="button" class="chip" data-f="ok">Neutres / positifs<b></b></button>
+          <button type="button" class="chip" data-f="spam">Spam<b></b></button>
         </div>
-        <input id="q" type="search" placeholder="Rechercher dans les commentaires…">
+        <div class="sort">
+          <span>Trier par</span>
+          <div class="seg" role="group" aria-label="Critère de tri" id="sortSeg">
+            <button type="button" data-s="score" aria-pressed="true">Mécontentement</button>
+            <button type="button" data-s="likes" aria-pressed="false">Likes</button>
+          </div>
+          <button type="button" class="dir" id="dir" data-dir="desc" aria-label="Inverser l'ordre de tri">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+            <span id="dirLabel">Décroissant</span>
+          </button>
+        </div>
       </div>
-      <div style="overflow-x:auto">
-        <table>
-          <thead><tr>
-            <th class="sortable" data-s="score">Mécontentement ↓</th>
-            <th>Commentaire</th>
-            <th class="sortable likes-col" data-s="likes" style="text-align:right">Likes</th>
-          </tr></thead>
-          <tbody id="rows"></tbody>
-        </table>
-      </div>
+      <div class="list" id="list"></div>
       <button type="button" class="more" id="more">Afficher plus</button>
     </section>
-
-    <p class="footer" id="foot"></p>
-  </main>
-</div>
+  </div>
+</main>
 <div id="tip" role="tooltip"></div>
 
 <script>
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const fmt = new Intl.NumberFormat("fr-FR");
-const pct = (x) => x.toLocaleString("fr-FR", { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + " %";
-const dec = (x) => x.toLocaleString("fr-FR", { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+const nf = new Intl.NumberFormat("fr-FR");
 const compact = new Intl.NumberFormat("fr-FR", { notation: "compact", maximumFractionDigits: 1 });
+const pct = (x) => x.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " %";
+const dec = (x) => x.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const TOKENS_PER_COMMENT = 730;   // mesuré : ~730 tokens d'entrée par commentaire avec le contexte vidéo
+const COMMENTS_PER_SECOND = 8;    // mesuré : ~300 commentaires en 38 s avec 16 requêtes parallèles
 
-let run = null, thr = 0.5, filter = "all", sortKey = "score", query = "", shown = 50;
+const state = { run: null, thr: 0.5, filter: "unhappy", sort: "score", dir: "desc", q: "", shown: 30,
+                count: "300", video: null };
 
 /* ---------- thème ---------- */
-function applyTheme(t) {
-  if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme;
-}
-try { applyTheme(localStorage.getItem("theme")); } catch (e) {}
+function setTheme(t) { if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; }
+try { setTheme(localStorage.getItem("theme")); } catch (e) {}
 $("theme").onclick = () => {
-  const dark = document.documentElement.dataset.theme
-    ? document.documentElement.dataset.theme === "dark"
-    : matchMedia("(prefers-color-scheme: dark)").matches;
-  const next = dark ? "light" : "dark";
-  applyTheme(next);
+  const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const next = cur === "dark" ? "light" : "dark";
+  setTheme(next);
   try { localStorage.setItem("theme", next); } catch (e) {}
 };
 
-/* ---------- tooltip ---------- */
+/* ---------- infobulle ---------- */
 const tip = $("tip");
 function showTip(e, html) {
   tip.innerHTML = html; tip.style.display = "block";
@@ -359,209 +454,283 @@ function showTip(e, html) {
   tip.style.left = x + "px"; tip.style.top = y + "px";
 }
 const hideTip = () => { tip.style.display = "none"; };
-function bindTip(el, html) {
-  el.addEventListener("mousemove", (e) => showTip(e, html));
-  el.addEventListener("mouseleave", hideTip);
+
+/* ---------- nombre de commentaires ---------- */
+function maxForVideo() {
+  const v = state.video;
+  return v ? Math.max(1, Math.min(v.comment_count, v.max_comments)) : null;
 }
+function requestedCount() {
+  const max = maxForVideo();
+  if (state.count === "all") return max;
+  if (state.count === "custom") {
+    const n = parseInt($("customN").value, 10) || 1;
+    return max ? Math.min(Math.max(1, n), max) : Math.max(1, n);
+  }
+  const n = +state.count;
+  return max ? Math.min(n, max) : n;
+}
+function duration(n) {
+  const s = Math.round(n / COMMENTS_PER_SECOND);
+  return s < 90 ? `${s} secondes` : `${Math.round(s / 60)} minutes`;
+}
+function renderCount() {
+  const v = state.video, max = maxForVideo();
+  document.querySelectorAll("#countSeg button").forEach((b) => {
+    b.setAttribute("aria-pressed", b.dataset.c === state.count);
+    if (/^\d+$/.test(b.dataset.c)) b.disabled = !!max && +b.dataset.c > max;
+  });
+  $("allBtn").textContent = max ? `Tout · ${nf.format(max)}` : "Tout";
+  $("customBox").hidden = state.count !== "custom";
+  if (max) { $("customN").max = max; $("customMax").textContent = `sur ${nf.format(max)} maximum`; }
+  else $("customMax").textContent = "";
+  $("vcount").hidden = !v;
+  if (v) $("vcount").innerHTML = `Cette vidéo compte <b class="num">${nf.format(v.comment_count)}</b> commentaires`;
+
+  const n = requestedCount();
+  const heavy = state.count === "all" || (state.count === "custom" && n > 500);
+  $("warn").hidden = !heavy || !n;
+  if (heavy && n) {
+    const capped = v && v.comment_count > v.max_comments;
+    $("warnText").innerHTML = `<b>Analyse de ${nf.format(n)} commentaires : environ ${duration(n)} et ${nf.format(Math.round(n * TOKENS_PER_COMMENT / 1000) * 1000)} tokens Jev.</b> `
+      + "YouTube ne renvoie que les commentaires principaux, pas les réponses : le total analysé peut être inférieur."
+      + (capped ? ` L'analyse est plafonnée à ${nf.format(v.max_comments)} commentaires.` : "");
+  }
+}
+$("countSeg").onclick = (e) => {
+  const b = e.target.closest("button"); if (!b || b.disabled) return;
+  state.count = b.dataset.c; renderCount();
+  if (state.count === "custom") $("customN").focus();
+};
+$("customN").oninput = renderCount;
+
+let videoTimer = null, videoReq = 0;
+$("video").addEventListener("input", () => {
+  clearTimeout(videoTimer);
+  videoTimer = setTimeout(async () => {
+    const val = $("video").value.trim(), id = ++videoReq;
+    if (!val) { state.video = null; renderCount(); return; }
+    try {
+      const r = await fetch("/api/video?video=" + encodeURIComponent(val));
+      const d = await r.json();
+      if (id !== videoReq) return;
+      state.video = r.ok ? d : null;
+    } catch (e) { state.video = null; }
+    renderCount();
+  }, 450);
+});
 
 /* ---------- calculs (côté client pour que le seuil soit réglable) ---------- */
 function compute() {
+  const run = state.run;
   const scored = run.comments.filter((c) => c.scores);
   const relevant = scored.filter((c) => c.scores.is_relevant >= 0.5);
-  const unhappy = relevant.filter((c) => c.scores.is_unhappy >= thr);
-  const n = relevant.length || 1;
+  const unhappy = relevant.filter((c) => c.scores.is_unhappy >= state.thr);
   const w = (c) => c.likes + 1;
   const sum = (a, f) => a.reduce((s, c) => s + f(c), 0);
+  const n = relevant.length || 1;
   const reasons = Object.keys(run.reason_labels).map((k) => {
     const count = unhappy.filter((c) => c.scores["reason_" + k] >= 0.5).length;
     return { key: k, label: run.reason_labels[k], count, pct: 100 * count / (unhappy.length || 1) };
   }).sort((a, b) => b.count - a.count);
   return {
     scored, relevant, unhappy, reasons,
-    spam: scored.length - relevant.length,
+    spam: scored.filter((c) => c.scores.is_relevant < 0.5),
     pct: 100 * unhappy.length / n,
     weighted: 100 * sum(unhappy, w) / (sum(relevant, w) || 1),
     mean: sum(relevant, (c) => c.scores.is_unhappy) / n,
   };
 }
-
 function level(p) {
-  if (p < 15) return { name: "Faible", color: "var(--good)" };
-  if (p < 35) return { name: "Modéré", color: "var(--warning)" };
-  if (p < 60) return { name: "Élevé", color: "var(--serious)" };
-  return { name: "Critique", color: "var(--critical)" };
+  if (p < 15) return ["faible", "var(--lvl-low)"];
+  if (p < 35) return ["modéré", "var(--lvl-mid)"];
+  if (p < 60) return ["élevé", "var(--lvl-high)"];
+  return ["critique", "var(--lvl-crit)"];
 }
+function replay(el) { el.style.animation = "none"; void el.offsetWidth; el.style.animation = ""; }
 
 /* ---------- rendu ---------- */
 function render() {
-  const s = compute();
-  $("thrv").textContent = dec(thr);
+  const s = compute(), run = state.run;
+  $("thrv").textContent = dec(state.thr);
 
-  $("k-pct").textContent = pct(s.pct);
-  const lv = level(s.pct);
-  $("k-meter").style.width = Math.min(100, s.pct) + "%";
-  $("k-meter").style.background = lv.color;
-  $("k-level").innerHTML = `<i style="background:${lv.color}"></i>Niveau ${lv.name.toLowerCase()}`;
-  $("k-count").textContent = `${fmt.format(s.unhappy.length)} sur ${fmt.format(s.relevant.length)} commentaires pertinents`;
-  $("k-weighted").textContent = pct(s.weighted);
-  $("k-mean").textContent = dec(s.mean);
-  $("k-n").textContent = fmt.format(s.scored.length);
-  $("k-spam").textContent = `${fmt.format(s.spam)} spam / hors sujet exclus` + (run.failed ? ` · ${run.failed} échecs` : "");
+  $("kPct").innerHTML = pct(s.pct).replace(" %", "<small> %</small>");
+  $("kPhrase").innerHTML = `des commentaires pertinents sont mécontents envers <b>${esc(run.target)}</b> — `
+    + `<span class="num">${nf.format(s.unhappy.length)}</span> sur <span class="num">${nf.format(s.relevant.length)}</span>.`;
+  const [lvl, color] = level(s.pct);
+  $("kMeter").style.width = Math.max(0.5, Math.min(100, s.pct)) + "%";
+  $("kMeter").style.setProperty("--lvl-color", color);
+  $("kLevel").innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>Niveau ${lvl}`;
+
+  $("kWeighted").textContent = pct(s.weighted);
+  $("kWeightedNote").textContent = s.weighted > s.pct + 5 ? "Les critiques sont les plus likées"
+    : s.weighted < s.pct - 5 ? "Les critiques sont peu likées" : "Les likes confirment la tendance";
+  $("kMean").textContent = dec(s.mean);
+  $("kN").textContent = nf.format(s.scored.length);
+  $("kSpam").textContent = `dont ${nf.format(s.spam.length)} spams écartés` + (run.failed ? ` · ${run.failed} échecs` : "");
+  $("kTime").textContent = run.elapsed < 90 ? `${Math.round(run.elapsed)} s` : `${Math.round(run.elapsed / 60)} min`;
 
   // Raisons
-  const maxPct = Math.max(1, ...s.reasons.map((r) => r.pct));
-  const rb = $("reasons"); rb.innerHTML = "";
-  s.reasons.forEach((r) => {
-    const row = document.createElement("div");
-    row.className = "hbar";
-    row.innerHTML = `<div class="name">${esc(r.label)}</div>
-      <div class="baseline-wrap"><div class="track">
-        <div class="fill" style="width:${(r.pct / maxPct) * 78}%"></div>
-        <span class="val">${pct(r.pct)} · ${fmt.format(r.count)}</span>
-      </div></div>`;
-    bindTip(row, `<b>${esc(r.label)}</b>${fmt.format(r.count)} commentaires sur ${fmt.format(s.unhappy.length)} mécontents`);
-    rb.appendChild(row);
+  $("reasonsSub").textContent = `Part des ${nf.format(s.unhappy.length)} mécontents qui citent chaque raison`;
+  $("reasons").innerHTML = s.reasons.map((r, i) => `
+    <div class="reason" data-i="${i}">
+      <div class="top"><span>${esc(r.label)}</span><span class="num">${pct(r.pct)}</span></div>
+      <div class="rtrack"><div class="fill" style="width:${Math.max(r.pct, 0.8)}%;animation-delay:${i * 0.08}s"></div></div>
+    </div>`).join("");
+  $("reasons").querySelectorAll(".reason").forEach((el) => {
+    const r = s.reasons[+el.dataset.i];
+    el.onmousemove = (e) => showTip(e, `<b>${esc(r.label)}</b><br>${nf.format(r.count)} commentaires sur ${nf.format(s.unhappy.length)} mécontents`);
+    el.onmouseleave = hideTip;
   });
 
-  // Histogramme (20 tranches de 0,05)
-  const bins = new Array(20).fill(0);
-  s.relevant.forEach((c) => { bins[Math.min(19, Math.floor(c.scores.is_unhappy * 20))]++; });
-  const top = Math.max(...bins, 1);
-  const step = niceStep(top);
-  const yMax = Math.ceil(top / step) * step;
-  const h = $("hist"); h.innerHTML = "";
-  for (let v = 0; v <= yMax; v += step) {
-    const y = 100 - (v / yMax) * 100;
-    if (v > 0) h.insertAdjacentHTML("beforeend", `<div class="gridline" style="top:${y}%"></div>`);
-    h.insertAdjacentHTML("beforeend", `<div class="ytick" style="top:${y}%">${fmt.format(v)}</div>`);
-  }
-  const cols = document.createElement("div"); cols.className = "cols";
-  bins.forEach((b, i) => {
-    const lo = i / 20, hi = (i + 1) / 20;
-    const col = document.createElement("div"); col.className = "col";
-    const on = lo >= thr - 1e-9;
-    col.innerHTML = `<div style="height:${(b / yMax) * 100}%;background:${on ? "var(--series-1)" : "var(--neutral-mark)"}"></div>`;
-    bindTip(col, `<b>Score ${dec(lo)} – ${dec(hi)}</b>${fmt.format(b)} commentaire${b > 1 ? "s" : ""}${on ? " · compté mécontent" : ""}`);
-    cols.appendChild(col);
-  });
-  h.appendChild(cols);
-  h.insertAdjacentHTML("beforeend", `<div class="thr" style="left:${thr * 100}%"><span>seuil ${dec(thr)}</span></div>`);
-  $("xticks").innerHTML = [0, 0.25, 0.5, 0.75, 1].map((v) => `<span style="left:${v * 100}%">${dec(v)}</span>`).join("");
-
-  renderTable(s);
+  renderHist(s);
+  renderList(s);
 }
 
 function niceStep(max) {
-  const raw = max / 4, p = Math.pow(10, Math.floor(Math.log10(raw)));
-  return [1, 2, 5, 10].map((m) => m * p).find((x) => x >= raw) || p * 10;
+  const raw = max / 3, p = Math.pow(10, Math.floor(Math.log10(raw)));
+  return [1, 2, 5, 10].map((m) => m * p).find((x) => x >= raw) || 10 * p;
+}
+function renderHist(s) {
+  const bins = new Array(20).fill(0);
+  s.relevant.forEach((c) => { bins[Math.min(19, Math.floor(c.scores.is_unhappy * 20))]++; });
+  const step = niceStep(Math.max(...bins, 1));
+  const top = Math.ceil(Math.max(...bins, 1) / step) * step;
+  let y = "", grid = "";
+  for (let v = 0; v <= top; v += step) {
+    const pos = 100 - (v / top) * 100;
+    y += `<span style="top:${pos}%">${nf.format(v)}</span>`;
+    if (v > 0) grid += `<div class="gridline" style="top:${pos}%"></div>`;
+  }
+  $("yaxis").innerHTML = y;
+  $("cols").innerHTML = grid + bins.map((b, i) => {
+    const hot = i / 20 >= state.thr - 1e-9;
+    return `<div class="col${hot ? " hot" : ""}" data-i="${i}"><div style="height:${(b / top) * 100}%;animation-delay:${i * 0.03}s"></div></div>`;
+  }).join("") + `<div class="thr" style="left:calc(${state.thr * 100}% - 1px)"></div>`;
+  $("cols").querySelectorAll(".col").forEach((el) => {
+    const i = +el.dataset.i, b = bins[i];
+    el.onmousemove = (e) => showTip(e, `<b>Score ${dec(i / 20)} – ${dec((i + 1) / 20)}</b><br>${nf.format(b)} commentaire${b > 1 ? "s" : ""}`);
+    el.onmouseleave = hideTip;
+  });
 }
 
-function renderTable(s) {
-  const spamSet = new Set(s.scored.filter((c) => c.scores.is_relevant < 0.5));
-  const unhappySet = new Set(s.unhappy);
-  const groups = {
-    all: s.scored,
-    unhappy: s.unhappy,
-    ok: s.relevant.filter((c) => !unhappySet.has(c)),
-    spam: [...spamSet],
-  };
+function renderList(s) {
+  const unhappy = new Set(s.unhappy), spam = new Set(s.spam);
+  const groups = { all: s.scored, unhappy: s.unhappy, ok: s.relevant.filter((c) => !unhappy.has(c)), spam: s.spam };
   document.querySelectorAll("#filters .chip").forEach((b) => {
-    b.querySelector(".n").textContent = fmt.format(groups[b.dataset.f].length);
-    b.setAttribute("aria-pressed", b.dataset.f === filter);
+    b.querySelector("b").textContent = nf.format(groups[b.dataset.f].length);
+    b.setAttribute("aria-pressed", b.dataset.f === state.filter);
   });
-  const q = query.toLowerCase();
-  let list = groups[filter].filter((c) => !q || c.text.toLowerCase().includes(q) || (c.author || "").toLowerCase().includes(q));
-  list = [...list].sort(sortKey === "likes"
-    ? (a, b) => b.likes - a.likes
-    : (a, b) => b.scores.is_unhappy - a.scores.is_unhappy || b.likes - a.likes);
-  document.querySelectorAll("th.sortable").forEach((th) => {
-    th.textContent = th.textContent.replace(/ ↓$/, "") + (th.dataset.s === sortKey ? " ↓" : "");
-  });
+  document.querySelectorAll("#sortSeg button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.s === state.sort));
+  $("dir").dataset.dir = state.dir;
+  $("dirLabel").textContent = state.dir === "desc" ? "Décroissant" : "Croissant";
 
-  const rows = list.slice(0, shown).map((c) => {
-    const u = c.scores.is_unhappy, isU = unhappySet.has(c), isSpam = spamSet.has(c);
-    const tags = isU ? Object.keys(run.reason_labels)
-      .filter((k) => c.scores["reason_" + k] >= 0.5)
+  const q = state.q.toLowerCase();
+  const key = state.sort === "likes" ? (c) => c.likes : (c) => c.scores.is_unhappy;
+  const sign = state.dir === "desc" ? -1 : 1;
+  const list = groups[state.filter]
+    .filter((c) => !q || c.text.toLowerCase().includes(q) || (c.author || "").toLowerCase().includes(q))
+    .sort((a, b) => sign * (key(a) - key(b)) || b.likes - a.likes);
+
+  const run = state.run;
+  $("list").innerHTML = list.slice(0, state.shown).map((c) => {
+    const u = c.scores.is_unhappy, isU = unhappy.has(c);
+    const tags = isU ? Object.keys(run.reason_labels).filter((k) => c.scores["reason_" + k] >= 0.5)
       .map((k) => `<span class="tag">${esc(run.reason_labels[k])}</span>`) : [];
-    if (isSpam) tags.push(`<span class="tag spam">Spam / hors sujet</span>`);
-    return `<tr>
-      <td class="score"><div class="mini ${isU ? "" : "dim"}"><div class="bar"><div style="width:${u * 100}%"></div></div>${dec(u)}</div></td>
-      <td><div class="ctext">${esc(c.text)}</div>
-        ${c.author ? `<div class="author">${esc(c.author)}</div>` : ""}
-        ${tags.length ? `<div class="tags">${tags.join("")}</div>` : ""}</td>
-      <td class="num likes-col">${fmt.format(c.likes)}</td>
-    </tr>`;
-  });
-  $("rows").innerHTML = rows.join("") || `<tr><td colspan="3" class="empty">Aucun commentaire.</td></tr>`;
-  $("more").style.display = list.length > shown ? "" : "none";
-  $("more").textContent = `Afficher plus (${fmt.format(list.length - shown)} restants)`;
+    if (spam.has(c)) tags.push(`<span class="tag spam">Spam / hors sujet</span>`);
+    return `<article class="item${isU ? "" : " dim"}">
+      <div class="score"><span class="num">${dec(u)}</span><div class="mini"><div class="fill" style="width:${u * 100}%"></div></div></div>
+      <div class="body"><p>${esc(c.text)}</p><div class="byline">${c.author ? `<span>${esc(c.author)}</span>` : ""}${tags.join("")}</div></div>
+      <div class="likes num"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10v11"/><path d="M15 5.9 14 10h5.8a2 2 0 0 1 1.9 2.6l-2.3 7A2 2 0 0 1 17.5 21H7V10l4.3-7.4A2 2 0 0 1 15 5.9z"/></svg><span>${nf.format(c.likes)}</span></div>
+    </article>`;
+  }).join("") || `<div class="none">Aucun commentaire.</div>`;
+  const rest = list.length - state.shown;
+  $("more").hidden = rest <= 0;
+  $("more").textContent = `Afficher plus · ${nf.format(rest)} restants`;
 }
 
-function showRun(r) {
-  run = r; thr = r.threshold ?? 0.5; filter = "all"; query = ""; shown = 50; sortKey = "score";
-  $("q").value = ""; $("thr").value = thr;
-  const v = r.video;
-  $("vthumb").src = v.thumbnail;
+function showRun(run) {
+  Object.assign(state, { run, thr: run.threshold ?? 0.5, filter: "unhappy", q: "", shown: 30 });
+  $("q").value = ""; $("thr").value = state.thr;
+  const v = run.video;
+  $("vthumb").src = v.thumbnail || "";
   $("vtitle").textContent = v.title;
   $("vtitle").href = "https://www.youtube.com/watch?v=" + encodeURIComponent(v.id);
-  $("vmeta").textContent = `${v.channel} · ${compact.format(v.views)} vues · ${compact.format(v.comment_count)} commentaires au total`;
-  $("vtarget").innerHTML = `Mécontentement mesuré envers : <b>${esc(r.target)}</b>`;
-  $("foot").textContent = `Analyse du ${new Date(r.created).toLocaleString("fr-FR")} · ${r.elapsed} s · `
-    + `${fmt.format(r.usage.input_tokens)} tokens Jev en entrée, ${fmt.format(r.usage.output_tokens)} en sortie · `
-    + `échantillon : commentaires les plus pertinents selon YouTube, réponses non incluses.`;
-  $("dash").classList.add("on");
+  $("vmeta").innerHTML = `${esc(v.channel)} · <span class="num">${compact.format(v.views)}</span> vues · <span class="num">${nf.format(v.comment_count)}</span> commentaires`;
+  const ctx = (run.context || "").split("Video summary:")[1];
+  $("vctx").hidden = !ctx;
+  $("vctxText").textContent = ctx ? ctx.trim() : "";
+  $("dash").hidden = false;
   render();
 }
 
-/* ---------- interactions ---------- */
-$("thr").oninput = (e) => { thr = +e.target.value; render(); };
-$("filters").onclick = (e) => {
-  const b = e.target.closest(".chip"); if (!b) return;
-  filter = b.dataset.f; shown = 50; renderTable(compute());
-};
-$("q").oninput = (e) => { query = e.target.value; shown = 50; renderTable(compute()); };
-document.querySelectorAll("th.sortable").forEach((th) => th.onclick = () => { sortKey = th.dataset.s; renderTable(compute()); });
-$("more").onclick = () => { shown += 100; renderTable(compute()); };
+/* ---------- interactions du tableau de bord ---------- */
+$("thr").oninput = (e) => { state.thr = +e.target.value; render(); };
+$("filters").onclick = (e) => { const b = e.target.closest(".chip"); if (!b) return; state.filter = b.dataset.f; state.shown = 30; renderList(compute()); };
+$("sortSeg").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; state.sort = b.dataset.s; renderList(compute()); };
+$("dir").onclick = () => { state.dir = state.dir === "desc" ? "asc" : "desc"; renderList(compute()); };
+$("q").oninput = (e) => { state.q = e.target.value; state.shown = 30; renderList(compute()); };
+$("more").onclick = () => { state.shown += 50; renderList(compute()); };
 
-async function loadRuns(selectId) {
-  const runs = await fetch("/api/runs").then((r) => r.json());
-  $("runs").innerHTML = `<option value="">${runs.length ? "Choisir une analyse précédente…" : "Aucune analyse"}</option>`
-    + runs.map((r) => `<option value="${esc(r.id)}">${esc(new Date(r.created).toLocaleString("fr-FR"))} — ${esc(r.title)} (${esc(r.target)}) · ${pct(r.pct_unhappy)}</option>`).join("");
-  if (selectId) $("runs").value = selectId;
+/* ---------- historique ---------- */
+async function loadRuns() {
+  const runs = await fetch("/api/runs").then((r) => r.json()).catch(() => []);
+  $("histPanel").innerHTML = runs.length ? runs.map((r) => `
+    <button type="button" data-id="${esc(r.id)}">
+      <span class="t">${esc(r.title)}</span>
+      <span class="m">${esc(new Date(r.created).toLocaleString("fr-FR"))} · envers ${esc(r.target)} · <span class="num">${pct(r.pct_unhappy)}</span></span>
+    </button>`).join("") : `<div class="empty">Aucune analyse pour l'instant.</div>`;
   return runs;
 }
-$("runs").onchange = async (e) => {
-  if (!e.target.value) return;
-  $("error").classList.remove("on");
-  showRun(await fetch("/api/runs/" + encodeURIComponent(e.target.value)).then((r) => r.json()));
+async function openRun(id) {
+  const r = await fetch("/api/runs/" + encodeURIComponent(id));
+  if (r.ok) { $("error").hidden = true; showRun(await r.json()); }
+}
+$("histBtn").onclick = async () => {
+  const open = $("histPanel").hidden;
+  if (open) await loadRuns();
+  $("histPanel").hidden = !open;
+  $("histBtn").setAttribute("aria-expanded", open);
 };
+$("histPanel").onclick = (e) => {
+  const b = e.target.closest("button[data-id]"); if (!b) return;
+  $("histPanel").hidden = true; $("histBtn").setAttribute("aria-expanded", false);
+  openRun(b.dataset.id);
+};
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".history")) { $("histPanel").hidden = true; $("histBtn").setAttribute("aria-expanded", false); }
+});
 
+/* ---------- lancement d'une analyse ---------- */
 let es = null;
 $("form").onsubmit = (e) => {
   e.preventDefault();
   if (es) es.close();
-  const params = new URLSearchParams({ video: $("video").value, target: $("target").value, max: $("max").value });
-  $("go").disabled = true;
-  $("error").classList.remove("on");
-  $("progress").classList.add("on");
-  $("pmsg").textContent = "Démarrage…";
-  $("pfill").style.width = "0";
+  const max = state.count === "all" ? "all" : String(requestedCount());
+  const params = new URLSearchParams({ video: $("video").value, target: $("target").value, max });
+  $("go").disabled = true; $("error").hidden = true;
+  $("progress").hidden = false; $("pmsg").textContent = "Démarrage…"; $("pfill").style.width = "0";
   es = new EventSource("/api/analyze?" + params);
-  const stop = () => { es.close(); es = null; $("go").disabled = false; $("progress").classList.remove("on"); };
+  const stop = () => { es.close(); es = null; $("go").disabled = false; $("progress").hidden = true; };
   es.addEventListener("status", (ev) => { $("pmsg").textContent = JSON.parse(ev.data).message; });
   es.addEventListener("progress", (ev) => {
     const d = JSON.parse(ev.data);
     $("pfill").style.width = (100 * d.done / d.total) + "%";
-    $("pmsg").textContent = `Notation Jev : ${fmt.format(d.done)} / ${fmt.format(d.total)}`;
+    $("pmsg").innerHTML = `Jev analyse les commentaires : <span class="num">${nf.format(d.done)} / ${nf.format(d.total)}</span>`;
   });
-  es.addEventListener("done", (ev) => { stop(); const r = JSON.parse(ev.data); showRun(r); loadRuns(r.id); });
-  es.addEventListener("fail", (ev) => { stop(); $("error").textContent = JSON.parse(ev.data).message; $("error").classList.add("on"); });
-  es.onerror = () => { if (es) { stop(); $("error").textContent = "Connexion au serveur perdue."; $("error").classList.add("on"); } };
+  es.addEventListener("done", (ev) => {
+    stop(); const run = JSON.parse(ev.data); showRun(run);
+    history.replaceState(null, "", "?run=" + encodeURIComponent(run.id));
+    $("dash").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  es.addEventListener("fail", (ev) => { stop(); $("error").textContent = JSON.parse(ev.data).message; $("error").hidden = false; });
+  es.onerror = () => { if (es) { stop(); $("error").textContent = "Connexion au serveur perdue."; $("error").hidden = false; } };
 };
 
+renderCount();
 loadRuns().then((runs) => {
   const id = new URLSearchParams(location.search).get("run") || (runs[0] && runs[0].id);
-  if (id) { $("runs").value = id; $("runs").onchange({ target: $("runs") }); }
+  if (id) openRun(id);
 });
 </script>
 </body>

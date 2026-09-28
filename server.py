@@ -25,7 +25,7 @@ import jev_comments as jc
 ROOT = Path(__file__).resolve().parent
 STATIC = ROOT / "static"
 RUNS = ROOT / "runs"
-MAX_COMMENTS = 2000
+MAX_COMMENTS = 5000
 PASSWORD = os.environ.get("APP_PASSWORD", "")
 
 
@@ -37,6 +37,8 @@ def run_analysis(video, target, limit, emit):
     emit("status", {"message": "Récupération de la vidéo…"})
     meta = jc.fetch_video(vid, yt_key)
     emit("video", meta)
+    if limit is None:  # « Tout »
+        limit = max(1, min(MAX_COMMENTS, meta["comment_count"]))
     emit("status", {"message": "Récupération des commentaires…"})
     comments = jc.fetch_comments(vid, yt_key, limit)
     if not comments:
@@ -112,6 +114,8 @@ class Handler(SimpleHTTPRequestHandler):
         url = urlparse(self.path)
         if url.path == "/api/analyze":
             return self.analyze(parse_qs(url.query))
+        if url.path == "/api/video":
+            return self.video_info(parse_qs(url.query))
         if url.path == "/api/runs":
             return self.list_runs()
         m = re.fullmatch(r"/api/runs/([\w-]+)", url.path)
@@ -121,6 +125,18 @@ class Handler(SimpleHTTPRequestHandler):
                 return self.send_json({"error": "Analyse introuvable"}, 404)
             return self.send_json(json.loads(f.read_text(encoding="utf-8")))
         return super().do_GET()
+
+    def video_info(self, q):
+        key = os.environ.get("Youtube_V3")
+        video = (q.get("video") or [""])[0].strip()
+        if not key or not video:
+            return self.send_json({"error": "Vidéo ou clé YouTube manquante"}, 400)
+        try:
+            meta = jc.fetch_video(jc.video_id(video), key)
+        except jc.YouTubeError as e:
+            return self.send_json({"error": str(e)}, 404)
+        meta["max_comments"] = MAX_COMMENTS
+        return self.send_json(meta)
 
     def list_runs(self):
         runs = []
@@ -137,8 +153,9 @@ class Handler(SimpleHTTPRequestHandler):
     def analyze(self, q):
         video = (q.get("video") or [""])[0].strip()
         target = (q.get("target") or [""])[0].strip() or jc.DEFAULT_TARGET
+        raw = (q.get("max") or ["300"])[0]
         try:
-            limit = max(1, min(MAX_COMMENTS, int((q.get("max") or ["300"])[0])))
+            limit = None if raw == "all" else max(1, min(MAX_COMMENTS, int(raw)))
         except ValueError:
             limit = 300
         self.send_response(200)

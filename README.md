@@ -13,10 +13,13 @@ Récupère les commentaires d'une vidéo (API YouTube Data v3), fait noter chacu
 python3 server.py          # puis ouvrir http://127.0.0.1:8000
 ```
 
-Colle une URL, choisis la cible et le nombre de commentaires : la progression s'affiche en
-direct, puis le dashboard montre le % de mécontents (brut et pondéré par likes), les raisons,
-la distribution des scores, et la liste filtrable des commentaires. Le seuil de décision est
-réglable en direct. Les clés restent côté serveur ; chaque analyse est enregistrée dans `runs/`.
+Colle une URL : l'app affiche aussitôt le nombre de commentaires de la vidéo. Choisis 100, 300,
+un nombre personnalisé (plafonné à ce total) ou « Tout » (avec une estimation du temps et des
+tokens). La progression s'affiche en direct, puis le dashboard montre le % de mécontents (brut et
+pondéré par likes), les raisons, la distribution des scores avec un seuil réglable, et la liste
+des commentaires filtrable, triable par mécontentement ou likes dans les deux sens.
+Thème clair et sombre, responsive. Les clés restent côté serveur ; chaque analyse est
+enregistrée dans `runs/`.
 
 ## Ligne de commande
 

@@ -27,7 +27,7 @@ THRESHOLD = 0.5
 REASONS = {
     "content": "Criticizes the substance of the video: wrong, shallow, boring, misleading or low-effort content.",
     "creator": "Criticizes the creator or company personally, their behavior, values or decisions.",
-    "ads": "Complains about sponsorship, ads, product placement or commercial intent.",
+    "ads": "Complains about sponsor segments, ads or product placement inside this video itself. Criticizing an advertisement that is the subject of the video does not count.",
     "clickbait": "Complains about clickbait, misleading title or thumbnail.",
     "technical": "Complains about audio, video quality, editing, length or pacing.",
 }
