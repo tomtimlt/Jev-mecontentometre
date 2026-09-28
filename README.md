@@ -1,11 +1,28 @@
-# Mécontentomètre : % de mécontents dans les commentaires YouTube, propulsé par Jev
+<p align="center">
+  <img src="docs/logo.png" alt="Logo du Mécontentomètre" width="140">
+</p>
 
-Récupère les commentaires d'une vidéo (API YouTube Data v3), fait noter chacun par
-[Jev](https://docs.typesafe.ai) (TypeSafe System One), puis agrège :
+<h1 align="center">Mécontentomètre</h1>
+
+<p align="center">
+  <b>Quel pourcentage des commentaires d'une vidéo YouTube est mécontent, et pourquoi ?</b><br>
+  Propulsé par <a href="https://docs.typesafe.ai">Jev</a>, le modèle de décision de TypeSafe.
+</p>
+
+<p align="center">
+  <img src="docs/dashboard.png" alt="Dashboard : taux de mécontentement, score moyen et nombre de commentaires analysés" width="900">
+</p>
+
+Récupère les commentaires d'une vidéo (API YouTube Data v3), fait noter chacun par Jev,
+puis agrège :
 
 - % de commentaires mécontents (brut et pondéré par les likes), spam exclu
 - raisons du mécontentement : fond, créateur/marque, pub, clickbait, technique
-- les commentaires mécontents les plus likés
+- distribution des scores et liste des commentaires, filtrable et triable
+
+<p align="center">
+  <img src="docs/graphiques.png" alt="Raisons du mécontentement et distribution des scores Jev" width="900">
+</p>
 
 ## Dashboard web
 
